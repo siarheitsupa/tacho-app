@@ -3,32 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tacho App: Режим труда и отдыха (Supabase)</title>
+    <title>Tacho App: Режим труда и отдыха</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1f2937; }
-        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4338ca; }
-        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .day-entries-wrapper { max-height: 5000px; overflow: hidden; transition: max-height 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
-        .day-entries-wrapper.collapsed { max-height: 0; }
-        .chevron-icon { transition: transform 0.3s ease-in-out; }
-        .chevron-icon.rotated { transform: rotate(-90deg); }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338ca;
+        }
+        /* Animation */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Collapsible Section */
+        .day-entries-wrapper {
+            max-height: 5000px;
+            overflow: hidden;
+            transition: max-height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .day-entries-wrapper.collapsed {
+            max-height: 0;
+        }
+        .chevron-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .chevron-icon.rotated {
+            transform: rotate(-90deg);
+        }
+        /* Style for date inputs */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white antialiased">
 
-    <div id="app-container" class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
         
         <header class="mb-8 text-center">
             <h1 class="text-3xl sm:text-4xl font-bold text-indigo-400">Tacho App</h1>
             <p class="text-gray-400 mt-2">Ваш помощник для учета режима труда и отдыха</p>
-            <div id="user-info" class="mt-4 text-xs text-gray-500"></div>
+            <div id="user-info" class="mt-4 text-xs text-gray-500">
+            </div>
         </header>
 
         <main>
@@ -84,7 +117,6 @@
                             <input type="text" id="other-cost-comment" name="other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="Оплата дороги, мойка...">
                         </div>
                     </div>
-
 
                     <div class="md:col-span-2">
                          <button type="submit" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500">
@@ -145,131 +177,241 @@
             </button>
         </div>
     </template>
-    
+
     <script type="module">
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-        
-        let supabase;
-        let allDocsData = [];
-        let userId = null;
+        // Импорт Supabase клиента из CDN
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-        const logForm = document.getElementById('log-form');
-        const activityTypeSelect = document.getElementById('activity-type');
-        const activityFields = document.getElementById('activity-fields');
-        const logEntriesContainer = document.getElementById('log-entries');
-        const reportContainer = document.getElementById('report-container');
-        const logEntryTemplate = document.getElementById('log-entry-template');
-        const loadingLogs = document.getElementById('loading-state-logs');
-        const loadingReport = document.getElementById('loading-state-report');
-        const userInfoDiv = document.getElementById('user-info');
-        const filterStartDateInput = document.getElementById('filter-start-date');
-        const filterEndDateInput = document.getElementById('filter-end-date');
-        const applyFilterBtn = document.getElementById('apply-filter-btn');
+        // Конфигурация Supabase
+        const SUPABASE_URL = typeof __supabase_url !== 'undefined' ? __supabase_url : 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = typeof __supabase_anon_key !== 'undefined' ? __supabase_anon_key : 'YOUR_SUPABASE_ANON_KEY';
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'default-tacho-app';
 
-        const activityStyles = {
-            'Начало смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`, color: 'bg-green-900/50' },
-            'Конец смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>`, color: 'bg-red-900/50' },
-            'Вождение': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/><path d="M10 9V7a4 4 0 018 0v2h-8z"/></svg>`, color: 'bg-blue-900/50' },
-            'Работа': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`, color: 'bg-green-900/50' },
-            'Ожидание': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`, color: 'bg-yellow-900/50' },
-            'Отдых': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05a9 9 0 11-12.89-12.89A9 9 0 0121.44 11.05z"/></svg>`, color: 'bg-purple-900/50' }
-        };
+        let supabase, currentUser, realtimeSubscription, allLogs = [];
 
-        const toggleActivityFields = () => {
-            const selectedType = activityTypeSelect.value;
-            activityFields.style.display = (selectedType === 'Начало смены' || selectedType === 'Конец смены') ? 'none' : 'grid';
-        };
+        function startApp() {
+            // Инициализация Supabase клиента
+            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            const logForm = document.getElementById('log-form');
+            const activityTypeSelect = document.getElementById('activity-type');
+            const activityFields = document.getElementById('activity-fields');
+            const logEntriesContainer = document.getElementById('log-entries');
+            const reportContainer = document.getElementById('report-container');
+            const logEntryTemplate = document.getElementById('log-entry-template');
+            const loadingLogs = document.getElementById('loading-state-logs');
+            const loadingReport = document.getElementById('loading-state-report');
+            const userInfoDiv = document.getElementById('user-info');
+            const filterStartDate = document.getElementById('filter-start-date');
+            const filterEndDate = document.getElementById('filter-end-date');
+            const applyFilterBtn = document.getElementById('apply-filter-btn');
 
-        const formatMinutes = (totalMinutes) => {
-            if (isNaN(totalMinutes) || totalMinutes <= 0) return '0 мин';
-            const hours = Math.floor(totalMinutes / 60);
-            const minutes = totalMinutes % 60;
-            const parts = [];
-            if (hours > 0) parts.push(`${hours} ч`);
-            if (minutes > 0) parts.push(`${minutes} мин`);
-            return parts.join(' ');
-        };
+            // Стили для различных типов активности
+            const activityStyles = {
+                'Начало смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`, color: 'bg-green-900/50' },
+                'Конец смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>`, color: 'bg-red-900/50' },
+                'Вождение': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/><path d="M10 9V7a4 4 0 018 0v2h-8z"/></svg>`, color: 'bg-blue-900/50' },
+                'Работа': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`, color: 'bg-green-900/50' },
+                'Ожидание': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`, color: 'bg-yellow-900/50' },
+                'Отдых': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05a9 9 0 11-12.89-12.89A9 9 0 0121.44 11.05z"/></svg>`, color: 'bg-purple-900/50' }
+            };
 
-        async function fetchAndRenderLogs() {
-            if (!userId || !supabase) return;
-            const { data, error } = await supabase
-                .from('logs')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
+            // Функция для скрытия/показа полей активности
+            const toggleActivityFields = () => {
+                const selectedType = activityTypeSelect.value;
+                activityFields.style.display = (selectedType === 'Начало смены' || selectedType === 'Конец смены') ? 'none' : 'grid';
+            };
+            
+            activityTypeSelect.addEventListener('change', toggleActivityFields);
+            
+            // Функция форматирования минут
+            const formatMinutes = (totalMinutes) => {
+                if (isNaN(totalMinutes) || totalMinutes <= 0) return '0 мин';
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                const parts = [];
+                if (hours > 0) parts.push(`${hours} ч`);
+                if (minutes > 0) parts.push(`${minutes} мин`);
+                return parts.join(' ');
+            };
+            
+            // Инициализация аутентификации
+            async function initAuth() {
+                try {
+                    // Проверяем текущую сессию
+                    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                    
+                    if (sessionError) {
+                        console.error('Session error:', sessionError);
+                    }
 
-            if (error) {
-                console.error('Error fetching logs:', error);
-                return;
+                    if (session) {
+                        currentUser = session.user;
+                        userInfoDiv.innerHTML = `Ваш ID: <span class="font-mono">${currentUser.id}</span>`;
+                        await setupRealtimeListener();
+                    } else {
+                        // Выполняем анонимный вход
+                        const { data, error } = await supabase.auth.signInAnonymously();
+                        if (error) {
+                            console.error('Anonymous sign-in error:', error);
+                            throw error;
+                        }
+                        currentUser = data.user;
+                        userInfoDiv.innerHTML = `Ваш ID: <span class="font-mono">${currentUser.id}</span>`;
+                        await setupRealtimeListener();
+                    }
+                } catch (error) {
+                    console.error("Authentication failed:", error);
+                    logEntriesContainer.innerHTML = '<p>Ошибка аутентификации. Пожалуйста, перезагрузите страницу.</p>';
+                }
             }
-            allDocsData = data;
-            applyFilter();
-        }
 
-        function applyFilter() {
-            let filteredData = allDocsData;
-            const startDate = filterStartDateInput.value ? new Date(filterStartDateInput.value) : null;
-            const endDate = filterEndDateInput.value ? new Date(filterEndDateInput.value) : null;
+            // Настройка real-time подписки
+            async function setupRealtimeListener() {
+                if (!currentUser) return;
 
-            if (startDate) startDate.setHours(0, 0, 0, 0);
-            if (endDate) endDate.setHours(23, 59, 59, 999);
+                // Отписываемся от предыдущей подписки
+                if (realtimeSubscription) {
+                    await supabase.removeChannel(realtimeSubscription);
+                }
 
-            if (startDate || endDate) {
-                filteredData = allDocsData.filter(doc => {
-                    const docDate = new Date(doc.created_at);
-                    const isAfterStart = !startDate || docDate >= startDate;
-                    const isBeforeEnd = !endDate || docDate <= endDate;
-                    return isAfterStart && isBeforeEnd;
+                // Получаем начальные данные
+                await loadInitialData();
+
+                // Настраиваем real-time подписку
+                realtimeSubscription = supabase
+                    .channel(`logs_${currentUser.id}`)
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'tacho_logs',
+                        filter: `user_id=eq.${currentUser.id}`
+                    }, (payload) => {
+                        console.log('Real-time change received:', payload);
+                        handleRealtimeChange(payload);
+                    })
+                    .subscribe();
+            }
+
+            // Загрузка начальных данных
+            async function loadInitialData() {
+                try {
+                    const { data, error } = await supabase
+                        .from('tacho_logs')
+                        .select('*')
+                        .eq('user_id', currentUser.id)
+                        .order('created_at', { ascending: false });
+
+                    if (error) {
+                        console.error('Error loading data:', error);
+                        return;
+                    }
+
+                    allLogs = data || [];
+                    applyFilter();
+                } catch (error) {
+                    console.error('Error in loadInitialData:', error);
+                    logEntriesContainer.innerHTML = '<p>Не удалось загрузить данные.</p>';
+                    reportContainer.innerHTML = '<p>Не удалось сформировать отчет.</p>';
+                }
+            }
+
+            // Обработка real-time изменений
+            function handleRealtimeChange(payload) {
+                switch (payload.eventType) {
+                    case 'INSERT':
+                        allLogs.unshift(payload.new);
+                        break;
+                    case 'UPDATE':
+                        const updateIndex = allLogs.findIndex(log => log.id === payload.new.id);
+                        if (updateIndex !== -1) {
+                            allLogs[updateIndex] = payload.new;
+                        }
+                        break;
+                    case 'DELETE':
+                        allLogs = allLogs.filter(log => log.id !== payload.old.id);
+                        break;
+                }
+                applyFilter();
+            }
+
+            // Применение фильтров
+            function applyFilter() {
+                let filteredLogs = [...allLogs];
+
+                const startDate = filterStartDate.value ? new Date(filterStartDate.value) : null;
+                const endDate = filterEndDate.value ? new Date(filterEndDate.value) : null;
+
+                if (startDate) startDate.setHours(0, 0, 0, 0);
+                if (endDate) endDate.setHours(23, 59, 59, 999);
+
+                if (startDate || endDate) {
+                    filteredLogs = allLogs.filter(log => {
+                        const logDate = new Date(log.created_at);
+                        const isAfterStart = !startDate || logDate >= startDate;
+                        const isBeforeEnd = !endDate || logDate <= endDate;
+                        return isAfterStart && isBeforeEnd;
+                    });
+                }
+                
+                renderData(filteredLogs);
+            }
+
+            applyFilterBtn.addEventListener('click', applyFilter);
+
+            // Отображение данных
+            function renderData(logsToDisplay) {
+                logEntriesContainer.innerHTML = '';
+                reportContainer.innerHTML = '';
+
+                if (logsToDisplay.length === 0) {
+                    loadingLogs.textContent = 'Нет записей за выбранный период.';
+                    loadingReport.textContent = 'Нет данных для отчета за выбранный период.';
+                    logEntriesContainer.appendChild(loadingLogs);
+                    reportContainer.appendChild(loadingReport);
+                    return;
+                }
+
+                // Группировка по дням
+                const groupedLogs = logsToDisplay.reduce((acc, log) => {
+                    const dateKey = new Date(log.created_at).toISOString().split('T')[0];
+                    if (!acc[dateKey]) acc[dateKey] = [];
+                    acc[dateKey].push(log);
+                    return acc;
+                }, {});
+                
+                const numberOfDays = Object.keys(groupedLogs).length;
+                renderOverallReport(logsToDisplay, numberOfDays);
+                
+                // Сортировка дат по убыванию
+                const sortedDateKeys = Object.keys(groupedLogs).sort((a, b) => new Date(b) - new Date(a));
+                
+                sortedDateKeys.forEach((dateKey, index) => {
+                    renderDayLog(dateKey, groupedLogs[dateKey], index === 0);
                 });
             }
-            renderData(filteredData);
-        }
-
-        function renderData(docsToDisplay) {
-            logEntriesContainer.innerHTML = '';
-            reportContainer.innerHTML = '';
-
-            if (docsToDisplay.length === 0) {
-                loadingLogs.textContent = 'Нет записей за выбранный период.';
-                loadingReport.textContent = 'Нет данных для отчета за выбранный период.';
-                logEntriesContainer.appendChild(loadingLogs);
-                reportContainer.appendChild(loadingReport);
-                return;
-            }
-
-            const groupedLogs = docsToDisplay.reduce((acc, doc) => {
-                const dateKey = new Date(doc.created_at).toISOString().split('T')[0];
-                if (!acc[dateKey]) acc[dateKey] = [];
-                acc[dateKey].push(doc);
-                return acc;
-            }, {});
             
-            renderOverallReport(docsToDisplay, Object.keys(groupedLogs).length);
-            
-            const sortedDateKeys = Object.keys(groupedLogs).sort((a,b) => new Date(b) - new Date(a));
-            sortedDateKeys.forEach((dateKey, index) => {
-                renderDayLog(dateKey, groupedLogs[dateKey], index === 0);
-            });
-        }
-        
-        function renderOverallReport(docs, numberOfDays) {
-            const summary = docs.reduce((acc, doc) => {
-                if(doc.activity_type !== 'Начало смены' && doc.activity_type !== 'Конец смены') {
-                    acc.totalDuration[doc.activity_type] = (acc.totalDuration[doc.activity_type] || 0) + (doc.duration || 0);
-                }
-                if (doc.start_mileage != null && doc.end_mileage != null && doc.end_mileage > doc.start_mileage) {
-                    acc.totalDistance += doc.end_mileage - doc.start_mileage;
-                }
-                acc.totalParkingCost += doc.parking_cost || 0;
-                acc.totalOtherCost += doc.other_cost || 0;
-                return acc;
-            }, { totalDuration: {}, totalDistance: 0, totalParkingCost: 0, totalOtherCost: 0 });
+            // Отображение общего отчета
+            function renderOverallReport(logs, numberOfDays) {
+                const summary = logs.reduce((acc, log) => {
+                    if (log.activity_type !== 'Начало смены' && log.activity_type !== 'Конец смены') {
+                        acc.totalDuration[log.activity_type] = (acc.totalDuration[log.activity_type] || 0) + (log.duration || 0);
+                    }
+                    if (log.start_mileage != null && log.end_mileage != null && log.end_mileage > log.start_mileage) {
+                        acc.totalDistance += log.end_mileage - log.start_mileage;
+                    }
+                    acc.totalParkingCost += log.parking_cost || 0;
+                    acc.totalOtherCost += log.other_cost || 0;
+                    return acc;
+                }, { totalDuration: {}, totalDistance: 0, totalParkingCost: 0, totalOtherCost: 0 });
 
-            reportContainer.innerHTML = '';
-            const reportCard = document.createElement('div');
-            reportCard.className = 'bg-gray-800 p-5 rounded-lg shadow-lg animate-fade-in';
-            reportCard.innerHTML = `
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300">
+                reportContainer.innerHTML = '';
+                const reportCard = document.createElement('div');
+                reportCard.className = 'bg-gray-800 p-5 rounded-lg shadow-lg animate-fade-in';
+                
+                const contentContainer = document.createElement('div');
+                contentContainer.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300';
+                contentContainer.innerHTML = `
                     <p><strong>Отработано дней:</strong> ${numberOfDays}</p>
                     <p><strong>Общий пробег:</strong> ${summary.totalDistance} км</p>
                     <p><strong>Общее вождение:</strong> ${formatMinutes(summary.totalDuration['Вождение'])}</p>
@@ -277,167 +419,195 @@
                     <p><strong>Общее ожидание:</strong> ${formatMinutes(summary.totalDuration['Ожидание'])}</p>
                     <p><strong>Общий отдых:</strong> ${formatMinutes(summary.totalDuration['Отдых'])}</p>
                     <p class="sm:col-span-2"><strong>Общие расходы:</strong> <span class="font-bold text-white">${(summary.totalParkingCost + summary.totalOtherCost).toFixed(2)} €</span></p>
-                </div>
-            `;
-            reportContainer.appendChild(reportCard);
-        }
-
-        function renderDayLog(dateKey, docs, isFirst) {
-            const dayContainer = document.createElement('div');
-            
-            const headerButton = document.createElement('button');
-            headerButton.className = 'w-full flex justify-between items-center text-left text-xl font-semibold text-indigo-300 border-b border-gray-700 pb-2 mb-2 cursor-pointer';
-            const date = new Date(dateKey);
-            date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
-            headerButton.innerHTML = `
-                <span>${date.toLocaleDateString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                <svg class="chevron-icon h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-            `;
-            
-            const entriesWrapper = document.createElement('div');
-            entriesWrapper.className = 'day-entries-wrapper space-y-4';
-            headerButton.addEventListener('click', () => {
-                const isCollapsed = entriesWrapper.classList.toggle('collapsed');
-                headerButton.querySelector('.chevron-icon').classList.toggle('rotated', isCollapsed);
-                entriesWrapper.style.maxHeight = isCollapsed ? '0px' : entriesWrapper.scrollHeight + 'px';
-            });
-
-            docs.forEach(doc => renderLogEntry(doc, entriesWrapper));
-            dayContainer.append(headerButton, entriesWrapper);
-            logEntriesContainer.appendChild(dayContainer);
-            
-            if (!isFirst) {
-               entriesWrapper.classList.add('collapsed');
-               headerButton.querySelector('.chevron-icon').classList.add('rotated');
-               entriesWrapper.style.maxHeight = '0px';
-            } else {
-               setTimeout(() => { if(!entriesWrapper.classList.contains('collapsed')) entriesWrapper.style.maxHeight = entriesWrapper.scrollHeight + 'px'; }, 0);
-            }
-        }
-
-        function renderLogEntry(doc, parentContainer) {
-            const entryElement = logEntryTemplate.content.cloneNode(true).firstElementChild;
-            const style = activityStyles[doc.activity_type] || activityStyles['Работа'];
-            
-            entryElement.querySelector('[data-icon-container]').innerHTML = style.icon;
-            entryElement.querySelector('[data-icon-container]').className = `p-3 rounded-full mt-1 shrink-0 ${style.color}`;
-            entryElement.querySelector('[data-activity-type]').textContent = doc.activity_type || 'Неизвестно';
-            entryElement.querySelector('[data-timestamp]').textContent = new Date(doc.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-            
-            const durationEl = entryElement.querySelector('[data-duration]');
-            if (doc.activity_type !== 'Начало смены' && doc.activity_type !== 'Конец смены') {
-                durationEl.textContent = formatMinutes(doc.duration);
-            } else {
-                durationEl.style.display = 'none';
-            }
-            
-            const mileageEl = entryElement.querySelector('[data-mileage]');
-            if (doc.start_mileage != null && doc.end_mileage != null) {
-                const diff = doc.end_mileage - doc.start_mileage;
-                mileageEl.textContent = `КМ: ${doc.start_mileage} - ${doc.end_mileage} (${diff >= 0 ? '+' : ''}${diff} км)`;
-            } else {
-                mileageEl.style.display = 'none';
+                `;
+                
+                reportCard.appendChild(contentContainer);
+                reportContainer.appendChild(reportCard);
             }
 
-            const costsContainer = entryElement.querySelector('[data-costs-container]');
-            costsContainer.innerHTML = '';
-            if (doc.parking_cost > 0) {
-                costsContainer.innerHTML += `<p>Парковка: <span class="font-semibold text-white">${doc.parking_cost.toFixed(2)} €</span> ${doc.parking_comment ? `<span class="text-gray-400">- ${doc.parking_comment}</span>` : ''}</p>`;
+            // Отображение записей по дням
+            function renderDayLog(dateKey, logs, isFirst) {
+                const dayContainer = document.createElement('div');
+                
+                const headerButton = document.createElement('button');
+                headerButton.className = 'w-full flex justify-between items-center text-left text-xl font-semibold text-indigo-300 border-b border-gray-700 pb-2 mb-2 cursor-pointer';
+
+                const date = new Date(dateKey);
+                date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+                headerButton.innerHTML = `
+                    <span>${date.toLocaleDateString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <svg class="chevron-icon h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                `;
+                
+                const entriesWrapper = document.createElement('div');
+                entriesWrapper.className = 'day-entries-wrapper space-y-4';
+                
+                headerButton.addEventListener('click', () => {
+                    const isCollapsed = entriesWrapper.classList.toggle('collapsed');
+                    headerButton.querySelector('.chevron-icon').classList.toggle('rotated', isCollapsed);
+                    entriesWrapper.style.maxHeight = isCollapsed ? '0px' : entriesWrapper.scrollHeight + 'px';
+                });
+
+                logs.forEach(log => renderLogEntry(log, entriesWrapper));
+                
+                dayContainer.appendChild(headerButton);
+                dayContainer.appendChild(entriesWrapper);
+                logEntriesContainer.appendChild(dayContainer);
+                
+                if (!isFirst) {
+                   entriesWrapper.classList.add('collapsed');
+                   headerButton.querySelector('.chevron-icon').classList.add('rotated');
+                   entriesWrapper.style.maxHeight = '0px';
+                } else {
+                   setTimeout(() => { 
+                       if(!entriesWrapper.classList.contains('collapsed')) 
+                           entriesWrapper.style.maxHeight = entriesWrapper.scrollHeight + 'px'; 
+                   }, 0);
+                }
             }
-            if (doc.other_cost > 0) {
-                 costsContainer.innerHTML += `<p>Прочее: <span class="font-semibold text-white">${doc.other_cost.toFixed(2)} €</span> ${doc.other_cost_comment ? `<span class="text-gray-400">- ${doc.other_cost_comment}</span>` : ''}</p>`;
+
+            // Отображение отдельной записи
+            function renderLogEntry(log, parentContainer) {
+                const entryElement = logEntryTemplate.content.cloneNode(true);
+                const style = activityStyles[log.activity_type] || activityStyles['Работа'];
+
+                entryElement.querySelector('[data-icon-container]').innerHTML = style.icon;
+                entryElement.querySelector('[data-icon-container]').className = `p-3 rounded-full mt-1 shrink-0 ${style.color}`;
+                entryElement.querySelector('[data-activity-type]').textContent = log.activity_type || 'Неизвестно';
+                entryElement.querySelector('[data-timestamp]').textContent = new Date(log.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) || 'Нет времени';
+                
+                const durationEl = entryElement.querySelector('[data-duration]');
+                if (log.activity_type !== 'Начало смены' && log.activity_type !== 'Конец смены') {
+                    durationEl.textContent = formatMinutes(log.duration);
+                } else {
+                    durationEl.style.display = 'none';
+                }
+                
+                const mileageEl = entryElement.querySelector('[data-mileage]');
+                if (log.start_mileage != null && log.end_mileage != null) {
+                    const diff = log.end_mileage - log.start_mileage;
+                    mileageEl.textContent = `КМ: ${log.start_mileage} - ${log.end_mileage} (${diff >= 0 ? '+' : ''}${diff} км)`;
+                } else {
+                    mileageEl.style.display = 'none';
+                }
+
+                const costsContainer = entryElement.querySelector('[data-costs-container]');
+                costsContainer.innerHTML = '';
+                if (log.parking_cost > 0) {
+                    const p = document.createElement('p');
+                    p.innerHTML = `Парковка: <span class="font-semibold text-white">${log.parking_cost.toFixed(2)} €</span> ${log.parking_comment ? `<span class="text-gray-400">- ${log.parking_comment}</span>` : ''}`;
+                    costsContainer.appendChild(p);
+                }
+                if (log.other_cost > 0) {
+                     const p = document.createElement('p');
+                    p.innerHTML = `Прочее: <span class="font-semibold text-white">${log.other_cost.toFixed(2)} €</span> ${log.other_cost_comment ? `<span class="text-gray-400">- ${log.other_cost_comment}</span>` : ''}`;
+                    costsContainer.appendChild(p);
+                }
+                
+                // Обработчик удаления записи
+                entryElement.querySelector('[data-delete-button]').addEventListener('click', async () => {
+                    if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
+                        try {
+                            const { error } = await supabase
+                                .from('tacho_logs')
+                                .delete()
+                                .eq('id', log.id);
+                            
+                            if (error) {
+                                console.error('Delete error:', error);
+                                alert('Ошибка при удалении записи.');
+                            }
+                        } catch (error) {
+                            console.error('Delete error:', error);
+                            alert('Произошла ошибка при удалении записи.');
+                        }
+                    }
+                });
+
+                parentContainer.appendChild(entryElement);
             }
-            
-            entryElement.querySelector('[data-delete-button]').addEventListener('click', async () => {
-                if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
-                    if (!supabase) return;
-                    const { error } = await supabase.from('logs').delete().match({ id: doc.id });
-                    if (error) console.error('Error deleting log:', error);
+
+            // Обработчик отправки формы
+            logForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUser) {
+                    alert("Пользователь не авторизован.");
+                    return;
+                }
+                
+                const activity = activityTypeSelect.value;
+                let newLog = {
+                    user_id: currentUser.id,
+                    activity_type: activity,
+                    app_id: APP_ID
+                };
+
+                if (activity !== 'Начало смены' && activity !== 'Конец смены') {
+                    const hours = parseInt(logForm['duration-hours'].value, 10) || 0;
+                    const minutes = parseInt(logForm['duration-minutes'].value, 10) || 0;
+                    const totalDurationInMinutes = (hours * 60) + minutes;
+                    
+                    if (totalDurationInMinutes <= 0) {
+                        alert("Пожалуйста, введите корректную длительность.");
+                        return;
+                    }
+
+                    const startMileage = parseInt(logForm['start-mileage'].value, 10);
+                    const endMileage = parseInt(logForm['end-mileage'].value, 10);
+                    
+                    if (!isNaN(startMileage) && !isNaN(endMileage) && endMileage < startMileage) {
+                        alert("Конечный километраж не может быть меньше начального.");
+                        return;
+                    }
+
+                    newLog = {
+                        ...newLog,
+                        duration: totalDurationInMinutes,
+                        start_mileage: !isNaN(startMileage) ? startMileage : null,
+                        end_mileage: !isNaN(endMileage) ? endMileage : null,
+                        parking_cost: parseFloat(logForm['parking-cost'].value) || 0,
+                        parking_comment: logForm['parking-comment'].value.trim(),
+                        other_cost: parseFloat(logForm['other-cost'].value) || 0,
+                        other_cost_comment: logForm['other-cost-comment'].value.trim(),
+                    };
+                }
+                
+                try {
+                    const { error } = await supabase
+                        .from('tacho_logs')
+                        .insert([newLog]);
+                    
+                    if (error) {
+                        console.error("Insert error:", error);
+                        alert("Произошла ошибка при сохранении данных.");
+                        return;
+                    }
+
+                    logForm.reset();
+                    toggleActivityFields();
+                    logForm.querySelector('#activity-type').focus();
+                } catch (error) {
+                    console.error("Error adding log:", error);
+                    alert("Произошла ошибка при сохранении данных.");
                 }
             });
 
-            parentContainer.appendChild(entryElement);
-        }
-
-        logForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!userId || !supabase) return alert("Пользователь не авторизован или Supabase не инициализирован.");
-            
-            const activity = activityTypeSelect.value;
-            let newLog = { activity_type: activity, user_id: userId };
-
-            if (activity !== 'Начало смены' && activity !== 'Конец смены') {
-                const hours = parseInt(logForm['duration-hours'].value, 10) || 0;
-                const minutes = parseInt(logForm['duration-minutes'].value, 10) || 0;
-                const totalDurationInMinutes = (hours * 60) + minutes;
-                if (totalDurationInMinutes <= 0) return alert("Пожалуйста, введите корректную длительность.");
-
-                const startMileage = parseInt(logForm['start-mileage'].value, 10);
-                const endMileage = parseInt(logForm['end-mileage'].value, 10);
-                if (!isNaN(startMileage) && !isNaN(endMileage) && endMileage < startMileage) return alert("Конечный километраж не может быть меньше начального.");
-
-                Object.assign(newLog, {
-                    duration: totalDurationInMinutes,
-                    start_mileage: !isNaN(startMileage) ? startMileage : null,
-                    end_mileage: !isNaN(endMileage) ? endMileage : null,
-                    parking_cost: parseFloat(logForm['parking-cost'].value) || 0,
-                    parking_comment: logForm['parking-comment'].value.trim(),
-                    other_cost: parseFloat(logForm['other-cost'].value) || 0,
-                    other_cost_comment: logForm['other-cost-comment'].value.trim(),
-                });
-            }
-            
-            const { error } = await supabase.from('logs').insert([newLog]);
-            if (error) {
-                console.error("Error adding document: ", error);
-                alert("Произошла ошибка при сохранении данных.");
-            } else {
-                logForm.reset();
-                toggleActivityFields();
-                activityTypeSelect.focus();
-            }
-        });
-
-        // --- App Initialization ---
-        async function main() {
-            // --- Supabase Configuration ---
-            const supabaseUrl = https://jlqpjtsswlylowaainmt.supabase.co; 
-            const supabaseKey = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpscXBqdHNzd2x5bG93YWFpbm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NDk2MDAsImV4cCI6MjA2NjAyNTYwMH0.6SzTzQbDNmPj4_eOTVJJzEfia00756mRFlYiwE0RCEw;
-        
-            if (supabaseUrl === 'YOUR_SUPABASE_URL' || supabaseKey === 'YOUR_SUPABASE_ANON_KEY') {
-                document.getElementById('app-container').innerHTML = `<div class="h-screen flex items-center justify-center text-center text-white bg-gray-900 p-4"><p class="text-2xl">Ошибка: Конфигурация Supabase не найдена.<br>Пожалуйста, следуйте руководству, чтобы вставить ваши ключи в HTML-файл.</p></div>`;
-                return;
-            }
-            
-            supabase = createClient(supabaseUrl, supabaseKey);
-            
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                userId = session.user.id;
-            } else {
-                const { data, error } = await supabase.auth.signInAnonymously();
-                if (error) return console.error("Anonymous sign in failed:", error);
-                userId = data.user.id;
-            }
-
-            userInfoDiv.innerHTML = `Ваш ID: <span class="font-mono">${userId}</span>`;
-            
-            // Initial data load and setup listeners
-            await fetchAndRenderLogs();
-            applyFilterBtn.addEventListener('click', applyFilter);
-            activityTypeSelect.addEventListener('change', toggleActivityFields);
-            
-            supabase.channel('public:logs')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'logs', filter: `user_id=eq.${userId}` }, payload => {
-                fetchAndRenderLogs();
-              })
-              .subscribe();
-
             toggleActivityFields();
+            initAuth();
         }
-        
-        main();
 
+        // Проверка конфигурации и запуск приложения
+        try {
+            if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+                throw new Error("Supabase configuration is not set properly.");
+            }
+            startApp();
+        } catch (e) {
+            console.error("Supabase config error:", e.message);
+            document.getElementById('loading-state-logs').textContent = 'Ошибка конфигурации Supabase.';
+        }
     </script>
 </body>
 </html>
