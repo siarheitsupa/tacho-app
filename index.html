@@ -7,55 +7,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4f46e5;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4338ca;
-        }
-        /* Animation */
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Collapsible Section */
-        .day-entries-wrapper {
-            max-height: 5000px; /* A large value to allow content to show */
-            overflow: hidden;
-            transition: max-height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .day-entries-wrapper.collapsed {
-            max-height: 0;
-        }
-        .chevron-icon {
-            transition: transform 0.3s ease-in-out;
-        }
-        .chevron-icon.rotated {
-            transform: rotate(-90deg);
-        }
-        /* Style for date inputs */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4338ca; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .day-entries-wrapper { max-height: 5000px; overflow: hidden; transition: max-height 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+        .day-entries-wrapper.collapsed { max-height: 0; }
+        .chevron-icon { transition: transform 0.3s ease-in-out; }
+        .chevron-icon.rotated { transform: rotate(-90deg); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
     </style>
 </head>
 <body class="bg-gray-900 text-white antialiased">
 
-    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+    <div id="app-container" class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
         
         <header class="mb-8 text-center">
             <h1 class="text-3xl sm:text-4xl font-bold text-indigo-400">Tacho App</h1>
@@ -179,15 +147,12 @@
     </template>
     
     <script type="module">
-        // Import Supabase client
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
         
-        // --- Global Variables ---
         let supabase;
         let allDocsData = [];
         let userId = null;
 
-        // --- DOM Element References ---
         const logForm = document.getElementById('log-form');
         const activityTypeSelect = document.getElementById('activity-type');
         const activityFields = document.getElementById('activity-fields');
@@ -201,7 +166,6 @@
         const filterEndDateInput = document.getElementById('filter-end-date');
         const applyFilterBtn = document.getElementById('apply-filter-btn');
 
-        // --- Activity Styles ---
         const activityStyles = {
             'Начало смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`, color: 'bg-green-900/50' },
             'Конец смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>`, color: 'bg-red-900/50' },
@@ -211,7 +175,6 @@
             'Отдых': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05a9 9 0 11-12.89-12.89A9 9 0 0121.44 11.05z"/></svg>`, color: 'bg-purple-900/50' }
         };
 
-        // --- Helper Functions ---
         const toggleActivityFields = () => {
             const selectedType = activityTypeSelect.value;
             activityFields.style.display = (selectedType === 'Начало смены' || selectedType === 'Конец смены') ? 'none' : 'grid';
@@ -227,7 +190,6 @@
             return parts.join(' ');
         };
 
-        // --- Data Fetching and Rendering ---
         async function fetchAndRenderLogs() {
             if (!userId || !supabase) return;
             const { data, error } = await supabase
@@ -397,7 +359,6 @@
             parentContainer.appendChild(entryElement);
         }
 
-        // --- Form and Auth Handling ---
         logForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!userId || !supabase) return alert("Пользователь не авторизован или Supabase не инициализирован.");
@@ -443,8 +404,8 @@
             const supabaseUrl = https://jlqpjtsswlylowaainmt.supabase.co; 
             const supabaseKey = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpscXBqdHNzd2x5bG93YWFpbm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NDk2MDAsImV4cCI6MjA2NjAyNTYwMH0.6SzTzQbDNmPj4_eOTVJJzEfia00756mRFlYiwE0RCEw;
         
-            if (supabaseUrl === https://jlqpjtsswlylowaainmt.supabase.co || supabaseKey === eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpscXBqdHNzd2x5bG93YWFpbm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0NDk2MDAsImV4cCI6MjA2NjAyNTYwMH0.6SzTzQbDNmPj4_eOTVJJzEfia00756mRFlYiwE0RCEw) {
-                document.body.innerHTML = `<div class="h-screen flex items-center justify-center text-center text-white bg-gray-900 p-4"><p class="text-2xl">Ошибка: Конфигурация Supabase не найдена.<br>Пожалуйста, следуйте руководству, чтобы вставить ваши ключи в HTML-файл.</p></div>`;
+            if (supabaseUrl === 'YOUR_SUPABASE_URL' || supabaseKey === 'YOUR_SUPABASE_ANON_KEY') {
+                document.getElementById('app-container').innerHTML = `<div class="h-screen flex items-center justify-center text-center text-white bg-gray-900 p-4"><p class="text-2xl">Ошибка: Конфигурация Supabase не найдена.<br>Пожалуйста, следуйте руководству, чтобы вставить ваши ключи в HTML-файл.</p></div>`;
                 return;
             }
             
@@ -464,6 +425,7 @@
             // Initial data load and setup listeners
             await fetchAndRenderLogs();
             applyFilterBtn.addEventListener('click', applyFilter);
+            activityTypeSelect.addEventListener('change', toggleActivityFields);
             
             supabase.channel('public:logs')
               .on('postgres_changes', { event: '*', schema: 'public', table: 'logs', filter: `user_id=eq.${userId}` }, payload => {
