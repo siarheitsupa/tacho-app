@@ -367,23 +367,23 @@
             let newLog = { activity_type: activity, user_id: userId };
 
             if (activity !== 'Начало смены' && activity !== 'Конец смены') {
-                const hours = parseInt(logForm['duration-hours'].value, 10) || 0;
-                const minutes = parseInt(logForm['duration-minutes'].value, 10) || 0;
+                const hours = parseInt(logForm.elements['duration-hours'].value, 10) || 0;
+                const minutes = parseInt(logForm.elements['duration-minutes'].value, 10) || 0;
                 const totalDurationInMinutes = (hours * 60) + minutes;
                 if (totalDurationInMinutes <= 0) return alert("Пожалуйста, введите корректную длительность.");
 
-                const startMileage = parseInt(logForm['start-mileage'].value, 10);
-                const endMileage = parseInt(logForm['end-mileage'].value, 10);
+                const startMileage = parseInt(logForm.elements['start-mileage'].value, 10);
+                const endMileage = parseInt(logForm.elements['end-mileage'].value, 10);
                 if (!isNaN(startMileage) && !isNaN(endMileage) && endMileage < startMileage) return alert("Конечный километраж не может быть меньше начального.");
 
                 Object.assign(newLog, {
                     duration: totalDurationInMinutes,
                     start_mileage: !isNaN(startMileage) ? startMileage : null,
                     end_mileage: !isNaN(endMileage) ? endMileage : null,
-                    parking_cost: parseFloat(logForm['parking-cost'].value) || 0,
-                    parking_comment: logForm['parking-comment'].value.trim(),
-                    other_cost: parseFloat(logForm['other-cost'].value) || 0,
-                    other_cost_comment: logForm['other-cost-comment'].value.trim(),
+                    parking_cost: parseFloat(logForm.elements['parking-cost'].value) || 0,
+                    parking_comment: logForm.elements['parking-comment'].value.trim(),
+                    other_cost: parseFloat(logForm.elements['other-cost'].value) || 0,
+                    other_cost_comment: logForm.elements['other-cost-comment'].value.trim(),
                 });
             }
             
@@ -398,9 +398,7 @@
             }
         });
 
-        // --- App Initialization ---
         async function main() {
-            // --- Supabase Configuration ---
             const supabaseUrl = https://fdefnbmqbljhkokmflya.supabase.co; 
             const supabaseKey = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZWZuYm1xYmxqaGtva21mbHlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTIyOTMsImV4cCI6MjA2NjI2ODI5M30.S83ZOKO77isvYaW7P79b-mgeL-AzNZD6nkqzSyZYNDU;
         
@@ -422,7 +420,6 @@
 
             userInfoDiv.innerHTML = `Ваш ID: <span class="font-mono">${userId}</span>`;
             
-            // Initial data load and setup listeners
             await fetchAndRenderLogs();
             applyFilterBtn.addEventListener('click', applyFilter);
             activityTypeSelect.addEventListener('change', toggleActivityFields);
