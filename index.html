@@ -94,10 +94,8 @@
                 </form>
             </div>
             
-            <!-- Report Section -->
             <div id="report-section" class="mb-12">
                 <h2 class="text-2xl font-semibold mb-6">Общий отчет</h2>
-                 <!-- Filter Controls -->
                 <div class="bg-gray-800/50 p-4 rounded-lg mb-6 flex flex-wrap items-end gap-4">
                     <div class="flex-grow">
                         <label for="filter-start-date" class="block text-sm font-medium text-gray-400 mb-1">Начало периода</label>
@@ -115,7 +113,6 @@
                 </div>
             </div>
 
-            <!-- Log Entries Display -->
             <div>
                 <h2 class="text-2xl font-semibold mb-6">История записей</h2>
                 <div id="log-entries" class="space-y-8">
@@ -125,7 +122,6 @@
         </main>
     </div>
 
-    <!-- Templates -->
     <template id="log-entry-template">
         <div class="bg-gray-800 p-4 rounded-lg shadow-md flex items-start justify-between flex-wrap gap-4 animate-fade-in">
             <div class="flex items-start gap-4 flex-1">
@@ -196,7 +192,7 @@
                 .from('logs')
                 .select('*')
                 .eq('user_id', userId)
-                .order('id', { ascending: false }); // Sort by id instead of created_at
+                .order('created_at', { ascending: false });
 
             if (error) {
                 console.error('Error fetching logs:', error);
@@ -216,7 +212,7 @@
 
             if (startDate || endDate) {
                 filteredData = allDocsData.filter(doc => {
-                    const docDate = new Date(doc.id.substring(0, 8)); // Approximate date from ID, not ideal
+                    const docDate = new Date(doc.created_at);
                     const isAfterStart = !startDate || docDate >= startDate;
                     const isBeforeEnd = !endDate || docDate <= endDate;
                     return isAfterStart && isBeforeEnd;
@@ -238,7 +234,7 @@
             }
 
             const groupedLogs = docsToDisplay.reduce((acc, doc) => {
-                const dateKey = new Date(doc.id.substring(0,8)).toISOString().split('T')[0];
+                const dateKey = new Date(doc.created_at).toISOString().split('T')[0];
                 if (!acc[dateKey]) acc[dateKey] = [];
                 acc[dateKey].push(doc);
                 return acc;
@@ -322,7 +318,7 @@
             entryElement.querySelector('[data-icon-container]').innerHTML = style.icon;
             entryElement.querySelector('[data-icon-container]').className = `p-3 rounded-full mt-1 shrink-0 ${style.color}`;
             entryElement.querySelector('[data-activity-type]').textContent = doc.activity_type || 'Неизвестно';
-            entryElement.querySelector('[data-timestamp]').textContent = new Date(doc.id.substring(0,8)).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            entryElement.querySelector('[data-timestamp]').textContent = new Date(doc.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             
             const durationEl = entryElement.querySelector('[data-duration]');
             if (doc.activity_type !== 'Начало смены' && doc.activity_type !== 'Конец смены') {
