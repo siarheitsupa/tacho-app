@@ -122,6 +122,63 @@
         </main>
     </div>
 
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden animate-fade-in">
+        <div class="bg-gray-800 rounded-2xl shadow-lg w-full max-w-lg p-6">
+            <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-4">Редактировать запись</h2>
+            <form id="edit-log-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                 <input type="hidden" id="edit-log-id">
+                 <div class="md:col-span-2">
+                    <label for="edit-activity-type" class="block text-sm font-medium text-gray-300 mb-2">Тип деятельности</label>
+                    <select id="edit-activity-type" name="edit-activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3">
+                        <option value="Начало смены">Начало смены</option>
+                        <option value="Конец смены">Конец смены</option>
+                        <option value="Вождение">Вождение</option>
+                        <option value="Работа">Работа</option>
+                        <option value="Ожидание">Ожидание</option>
+                        <option value="Отдых">Отдых</option>
+                    </select>
+                </div>
+                 <div id="edit-activity-fields" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Длительность</label>
+                        <div class="flex gap-4">
+                            <input type="number" id="edit-duration-hours" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Часы">
+                            <input type="number" id="edit-duration-minutes" min="0" max="59" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Минуты">
+                        </div>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Километраж</label>
+                        <div class="flex gap-4">
+                            <input type="number" id="edit-start-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Начальный">
+                            <input type="number" id="edit-end-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Конечный">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Затраты на парковку (€)</label>
+                        <input type="number" id="edit-parking-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Комментарий к парковке</label>
+                        <input type="text" id="edit-parking-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Прочие расходы (€)</label>
+                        <input type="number" id="edit-other-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Комментарий к расходам</label>
+                        <input type="text" id="edit-other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
+                    </div>
+                </div>
+                <div class="md:col-span-2 flex justify-end gap-4 mt-4">
+                    <button type="button" id="cancel-edit-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">Отмена</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <template id="log-entry-template">
         <div class="bg-gray-800 p-4 rounded-lg shadow-md flex items-start justify-between flex-wrap gap-4 animate-fade-in">
             <div class="flex items-start gap-4 flex-1">
@@ -136,9 +193,14 @@
                     <div class="mt-3 text-sm text-gray-200 space-y-1" data-costs-container></div>
                 </div>
             </div>
-            <button class="text-gray-500 hover:text-red-500 transition-colors self-center" data-delete-button>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            </button>
+            <div class="flex gap-2 items-center">
+                 <button class="text-gray-500 hover:text-indigo-400 transition-colors" data-edit-button>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                 </button>
+                 <button class="text-gray-500 hover:text-red-500 transition-colors" data-delete-button>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+            </div>
         </div>
     </template>
     
@@ -162,6 +224,13 @@
         const filterEndDateInput = document.getElementById('filter-end-date');
         const applyFilterBtn = document.getElementById('apply-filter-btn');
 
+        // Edit Modal Elements
+        const editModal = document.getElementById('edit-modal');
+        const editLogForm = document.getElementById('edit-log-form');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const editActivityFields = document.getElementById('edit-activity-fields');
+        const editActivityTypeSelect = document.getElementById('edit-activity-type');
+
         const activityStyles = {
             'Начало смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`, color: 'bg-green-900/50' },
             'Конец смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>`, color: 'bg-red-900/50' },
@@ -171,9 +240,11 @@
             'Отдых': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05a9 9 0 11-12.89-12.89A9 9 0 0121.44 11.05z"/></svg>`, color: 'bg-purple-900/50' }
         };
 
-        const toggleActivityFields = () => {
-            const selectedType = activityTypeSelect.value;
-            activityFields.style.display = (selectedType === 'Начало смены' || selectedType === 'Конец смены') ? 'none' : 'grid';
+        const toggleActivityFields = (formType = 'main') => {
+            const select = formType === 'edit' ? editActivityTypeSelect : activityTypeSelect;
+            const fields = formType === 'edit' ? editActivityFields : activityFields;
+            const selectedType = select.value;
+            fields.style.display = (selectedType === 'Начало смены' || selectedType === 'Конец смены') ? 'none' : 'grid';
         };
 
         const formatMinutes = (totalMinutes) => {
@@ -344,6 +415,7 @@
                  costsContainer.innerHTML += `<p>Прочее: <span class="font-semibold text-white">${doc.other_cost.toFixed(2)} €</span> ${doc.other_cost_comment ? `<span class="text-gray-400">- ${doc.other_cost_comment}</span>` : ''}</p>`;
             }
             
+            entryElement.querySelector('[data-edit-button]').addEventListener('click', () => openEditModal(doc));
             entryElement.querySelector('[data-delete-button]').addEventListener('click', async () => {
                 if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
                     if (!supabase) return;
@@ -358,6 +430,30 @@
             });
 
             parentContainer.appendChild(entryElement);
+        }
+
+        function openEditModal(doc) {
+            editLogForm.elements['edit-log-id'].value = doc.id;
+            editLogForm.elements['edit-activity-type'].value = doc.activity_type;
+
+            const hours = doc.duration ? Math.floor(doc.duration / 60) : '';
+            const minutes = doc.duration ? doc.duration % 60 : '';
+            
+            editLogForm.elements['edit-duration-hours'].value = hours;
+            editLogForm.elements['edit-duration-minutes'].value = minutes;
+            editLogForm.elements['edit-start-mileage'].value = doc.start_mileage;
+            editLogForm.elements['edit-end-mileage'].value = doc.end_mileage;
+            editLogForm.elements['edit-parking-cost'].value = doc.parking_cost;
+            editLogForm.elements['edit-parking-comment'].value = doc.parking_comment;
+            editLogForm.elements['edit-other-cost'].value = doc.other_cost;
+            editLogForm.elements['edit-other-cost-comment'].value = doc.other_cost_comment;
+            
+            toggleActivityFields('edit');
+            editModal.classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            editModal.classList.add('hidden');
         }
 
         logForm.addEventListener('submit', async (e) => {
@@ -396,7 +492,44 @@
                 logForm.reset();
                 toggleActivityFields();
                 activityTypeSelect.focus();
-                fetchAndRenderLogs(); // Re-fetch data to update UI
+                fetchAndRenderLogs();
+            }
+        });
+        
+        editLogForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const logId = editLogForm.elements['edit-log-id'].value;
+            if (!logId || !supabase) return;
+
+            const activity = editActivityTypeSelect.value;
+            let updatedLog = { activity_type: activity };
+
+            if (activity !== 'Начало смены' && activity !== 'Конец смены') {
+                const hours = parseInt(editLogForm.elements['edit-duration-hours'].value, 10) || 0;
+                const minutes = parseInt(editLogForm.elements['edit-duration-minutes'].value, 10) || 0;
+                updatedLog.duration = (hours * 60) + minutes;
+
+                const startMileage = parseInt(editLogForm.elements['edit-start-mileage'].value, 10);
+                const endMileage = parseInt(editLogForm.elements['edit-end-mileage'].value, 10);
+                
+                updatedLog.start_mileage = !isNaN(startMileage) ? startMileage : null;
+                updatedLog.end_mileage = !isNaN(endMileage) ? endMileage : null;
+                updatedLog.parking_cost = parseFloat(editLogForm.elements['edit-parking-cost'].value) || 0;
+                updatedLog.parking_comment = editLogForm.elements['edit-parking-comment'].value.trim();
+                updatedLog.other_cost = parseFloat(editLogForm.elements['edit-other-cost'].value) || 0;
+                updatedLog.other_cost_comment = editLogForm.elements['edit-other-cost-comment'].value.trim();
+            } else {
+                updatedLog = { activity_type: activity }; // Clear other fields if it's a shift start/end
+            }
+
+            const { error } = await supabase.from('logs').update(updatedLog).eq('id', logId);
+
+            if(error) {
+                console.error('Error updating log:', error);
+                alert('Ошибка при обновлении записи.');
+            } else {
+                closeEditModal();
+                fetchAndRenderLogs();
             }
         });
 
@@ -435,7 +568,9 @@
             
             await fetchAndRenderLogs();
             applyFilterBtn.addEventListener('click', applyFilter);
-            activityTypeSelect.addEventListener('change', toggleActivityFields);
+            activityTypeSelect.addEventListener('change', () => toggleActivityFields('main'));
+            editActivityTypeSelect.addEventListener('change', () => toggleActivityFields('edit'));
+            cancelEditBtn.addEventListener('click', closeEditModal);
 
         }
         
