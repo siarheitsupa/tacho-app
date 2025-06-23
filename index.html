@@ -348,7 +348,12 @@
                 if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
                     if (!supabase) return;
                     const { error } = await supabase.from('logs').delete().match({ id: doc.id });
-                    if (error) console.error('Error deleting log:', error);
+                    if (error) {
+                        console.error('Error deleting log:', error);
+                        alert("Произошла ошибка при удалении записи.");
+                    } else {
+                        fetchAndRenderLogs(); // Re-fetch data to update UI
+                    }
                 }
             });
 
@@ -391,6 +396,7 @@
                 logForm.reset();
                 toggleActivityFields();
                 activityTypeSelect.focus();
+                fetchAndRenderLogs(); // Re-fetch data to update UI
             }
         });
 
@@ -430,14 +436,7 @@
             await fetchAndRenderLogs();
             applyFilterBtn.addEventListener('click', applyFilter);
             activityTypeSelect.addEventListener('change', toggleActivityFields);
-            
-            supabase.channel('public:logs')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'logs', filter: `user_id=eq.${userId}` }, payload => {
-                fetchAndRenderLogs();
-              })
-              .subscribe();
 
-            toggleActivityFields();
         }
         
         main();
