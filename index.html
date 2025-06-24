@@ -32,57 +32,68 @@
 <body class="bg-gray-900 text-white antialiased">
 
     <!-- Auth Screen -->
-    <div id="auth-screen" class="min-h-screen flex items-center justify-center">
-        <div class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg">
-            <div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Войдите в свой аккаунт</h2>
-            </div>
-            <form id="login-form" class="mt-8 space-y-6">
-                <div class="rounded-md shadow-sm -space-y-px">
-                    <div>
-                        <input id="login-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
-                    </div>
-                    <div>
-                        <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
-                    </div>
-                </div>
+    <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div id="auth-forms-wrapper" class="w-full max-w-md">
+            <!-- Login Form -->
+            <div id="login-form-container" class="p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg">
                 <div>
-                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Войти
-                    </button>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Войдите в свой аккаунт</h2>
                 </div>
-            </form>
-             <div class="text-sm text-center">
-                <a href="#" id="show-register-link" class="font-medium text-indigo-400 hover:text-indigo-300">
-                    Нет аккаунта? Зарегистрироваться
-                </a>
-            </div>
-             <p id="auth-error" class="mt-2 text-center text-sm text-red-500"></p>
-        </div>
-        
-        <div id="register-form-container" class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg hidden">
-             <div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Создать новый аккаунт</h2>
-            </div>
-            <form id="register-form" class="mt-8 space-y-6">
-                 <div class="rounded-md shadow-sm -space-y-px">
-                    <div>
-                        <input id="register-email" name="email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
+                <form id="login-form" class="mt-8 space-y-6">
+                    <div class="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <input id="login-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
+                        </div>
+                        <div>
+                            <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
+                        </div>
                     </div>
                     <div>
-                        <input id="register-password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Войти
+                        </button>
                     </div>
+                </form>
+                 <div class="text-sm text-center">
+                    <a href="#" id="show-register-link" class="font-medium text-indigo-400 hover:text-indigo-300">
+                        Нет аккаунта? Зарегистрироваться
+                    </a>
                 </div>
-                <div>
-                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Зарегистрироваться
-                    </button>
+                 <p id="auth-error" class="mt-2 text-center text-sm text-red-500"></p>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="register-form-container" class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg hidden">
+                 <div>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Создать новый аккаунт</h2>
                 </div>
-            </form>
-             <div class="text-sm text-center">
-                <a href="#" id="show-login-link" class="font-medium text-indigo-400 hover:text-indigo-300">
-                    Уже есть аккаунт? Войти
-                </a>
+                <form id="register-form" class="mt-8 space-y-6">
+                     <div class="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <input id="register-email" name="email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
+                        </div>
+                        <div>
+                            <input id="register-password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Зарегистрироваться
+                        </button>
+                    </div>
+                </form>
+                 <div class="text-sm text-center">
+                    <a href="#" id="show-login-link" class="font-medium text-indigo-400 hover:text-indigo-300">
+                        Уже есть аккаунт? Войти
+                    </a>
+                </div>
+            </div>
+
+             <!-- Success Message -->
+            <div id="register-success" class="p-8 space-y-4 bg-gray-800 rounded-2xl shadow-lg hidden text-center animate-fade-in">
+                <h2 class="text-2xl font-bold text-green-400">Регистрация успешна!</h2>
+                <p class="text-gray-300">Мы отправили ссылку для подтверждения на ваш email. Пожалуйста, перейдите по ней, чтобы активировать аккаунт.</p>
+                <a href="#" id="back-to-login-link" class="font-medium text-indigo-400 hover:text-indigo-300 block pt-4">Вернуться ко входу</a>
             </div>
         </div>
     </div>
@@ -277,7 +288,6 @@
         let allDocsData = [];
         let currentUserId = null;
 
-        // Main App DOM Elements
         const appContainer = document.getElementById('app-container');
         const logForm = document.getElementById('log-form');
         const activityTypeSelect = document.getElementById('activity-type');
@@ -290,16 +300,18 @@
         const filterEndDateInput = document.getElementById('filter-end-date');
         const applyFilterBtn = document.getElementById('apply-filter-btn');
 
-        // Auth DOM Elements
         const authScreen = document.getElementById('auth-screen');
+        const authFormsWrapper = document.getElementById('auth-forms-wrapper');
+        const loginFormContainer = document.getElementById('login-form-container');
         const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
         const registerFormContainer = document.getElementById('register-form-container');
+        const registerForm = document.getElementById('register-form');
         const showRegisterLink = document.getElementById('show-register-link');
         const showLoginLink = document.getElementById('show-login-link');
         const authError = document.getElementById('auth-error');
-
-        // Edit Modal Elements
+        const registerSuccessDiv = document.getElementById('register-success');
+        const backToLoginLink = document.getElementById('back-to-login-link');
+        
         const editModal = document.getElementById('edit-modal');
         const editLogForm = document.getElementById('edit-log-form');
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
@@ -496,7 +508,7 @@
                         console.error('Error deleting log:', error);
                         alert("Произошла ошибка при удалении записи.");
                     } else {
-                        fetchAndRenderLogs(); // Re-fetch data to update UI
+                        fetchAndRenderLogs();
                     }
                 }
             });
@@ -591,7 +603,6 @@
                 updatedLog.other_cost = parseFloat(editLogForm.elements['edit-other-cost'].value) || 0;
                 updatedLog.other_cost_comment = editLogForm.elements['edit-other-cost-comment'].value.trim();
             } else {
-                // Clear fields that don't apply to shift start/end
                 updatedLog.duration = null;
                 updatedLog.start_mileage = null;
                 updatedLog.end_mileage = null;
@@ -612,32 +623,36 @@
             }
         });
         
-        // ---- AUTHENTICATION LOGIC ----
-        
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            authError.textContent = '';
             const email = loginForm.elements.email.value;
             const password = loginForm.elements.password.value;
             const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) authError.textContent = 'Ошибка входа: ' + error.message;
-            else authError.textContent = '';
         });
 
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            authError.textContent = '';
             const email = registerForm.elements.email.value;
             const password = registerForm.elements.password.value;
             const { error } = await supabase.auth.signUp({ email, password });
-            if (error) authError.textContent = 'Ошибка регистрации: ' + error.message;
-            else {
-                authError.textContent = 'Пожалуйста, проверьте вашу почту для подтверждения регистрации.';
+
+            if (error) {
+                authError.textContent = 'Ошибка регистрации: ' + error.message;
+            } else {
+                loginFormContainer.classList.add('hidden');
+                registerFormContainer.classList.add('hidden');
+                registerSuccessDiv.classList.remove('hidden');
                 registerForm.reset();
             }
         });
 
         showRegisterLink.addEventListener('click', (e) => {
             e.preventDefault();
-            loginForm.parentElement.classList.add('hidden');
+            loginFormContainer.classList.add('hidden');
+            registerSuccessDiv.classList.add('hidden');
             registerFormContainer.classList.remove('hidden');
             authError.textContent = '';
         });
@@ -645,14 +660,20 @@
         showLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             registerFormContainer.classList.add('hidden');
-            loginForm.parentElement.classList.remove('hidden');
+            registerSuccessDiv.classList.add('hidden');
+            loginFormContainer.classList.remove('hidden');
             authError.textContent = '';
         });
-
+        
+        backToLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerSuccessDiv.classList.add('hidden');
+            loginFormContainer.classList.remove('hidden');
+        });
 
         async function main() {
-            const supabaseUrl = 'https://fdefnbmqbljhkokmflya.supabase.co'; 
-            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZWZuYm1xYmxqaGtva21mbHlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTIyOTMsImV4cCI6MjA2NjI2ODI5M30.S83ZOKO77isvYaW7P79b-mgeL-AzNZD6nkqzSyZYNDU';
+            const supabaseUrl = 'YOUR_SUPABASE_URL'; 
+            const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
         
             if (supabaseUrl === 'YOUR_SUPABASE_URL' || supabaseKey === 'YOUR_SUPABASE_ANON_KEY') {
                 document.body.innerHTML = `<div class="h-screen flex items-center justify-center text-center text-white bg-gray-900 p-4"><p class="text-2xl">Ошибка: Конфигурация Supabase не найдена.<br>Пожалуйста, следуйте руководству, чтобы вставить ваши ключи в HTML-файл.</p></div>`;
@@ -678,7 +699,6 @@
                 }
             });
 
-            // Initial setup for non-app elements
             applyFilterBtn.addEventListener('click', applyFilter);
             activityTypeSelect.addEventListener('change', () => toggleActivityFields('main'));
             editActivityTypeSelect.addEventListener('change', () => toggleActivityFields('edit'));
