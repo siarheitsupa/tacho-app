@@ -19,6 +19,15 @@
         .chevron-icon { transition: transform 0.3s ease-in-out; }
         .chevron-icon.rotated { transform: rotate(-90deg); }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        /* Hide number input spinners */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+          -webkit-appearance: none; 
+          margin: 0; 
+        }
+        input[type=number] {
+          -moz-appearance: textfield; /* Firefox */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white antialiased">
@@ -519,7 +528,14 @@
                 updatedLog.other_cost = parseFloat(editLogForm.elements['edit-other-cost'].value) || 0;
                 updatedLog.other_cost_comment = editLogForm.elements['edit-other-cost-comment'].value.trim();
             } else {
-                updatedLog = { activity_type: activity }; // Clear other fields if it's a shift start/end
+                // Clear fields that don't apply to shift start/end
+                updatedLog.duration = null;
+                updatedLog.start_mileage = null;
+                updatedLog.end_mileage = null;
+                updatedLog.parking_cost = null;
+                updatedLog.parking_comment = null;
+                updatedLog.other_cost = null;
+                updatedLog.other_cost_comment = null;
             }
 
             const { error } = await supabase.from('logs').update(updatedLog).eq('id', logId);
@@ -571,7 +587,6 @@
             activityTypeSelect.addEventListener('change', () => toggleActivityFields('main'));
             editActivityTypeSelect.addEventListener('change', () => toggleActivityFields('edit'));
             cancelEditBtn.addEventListener('click', closeEditModal);
-
         }
         
         main();
