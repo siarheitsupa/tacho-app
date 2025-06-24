@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tacho App: Режим труда и отдыха (Supabase)</title>
+    <title>Tacho App: Режим труда и отдыха</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
     <style>
         body { font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 8px; }
@@ -18,15 +19,26 @@
         .day-entries-wrapper.collapsed { max-height: 0; }
         .chevron-icon { transition: transform 0.3s ease-in-out; }
         .chevron-icon.rotated { transform: rotate(-90deg); }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
           -webkit-appearance: none; 
           margin: 0; 
         }
-        input[type=number] {
-          -moz-appearance: textfield;
-        }
+        input[type=number] { -moz-appearance: textfield; }
+        .pika-single.dark-theme { color: #e5e7eb; background: #1f2937; border: 1px solid #4b5563; border-radius: 0.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .pika-single.dark-theme .pika-lendar { width: 100%; }
+        .pika-single.dark-theme .pika-select-year, .pika-single.dark-theme .pika-select-month { -webkit-appearance: none; -moz-appearance: none; appearance: none; color: #e5e7eb !important; background-color: #374151 !important; border: 1px solid #4b5563; border-radius: 0.25rem; font-size: 14px; padding: 4px 8px; margin: 0 4px; }
+        .pika-single.dark-theme .pika-select-month option, .pika-single.dark-theme .pika-select-year option { background-color: #374151; color: #e5e7eb; }
+        .pika-single.dark-theme .pika-select-year:focus, .pika-single.dark-theme .pika-select-month:focus { outline: none; border-color: #4f46e5; }
+        .pika-single.dark-theme .pika-label { color: #fff; font-size: 16px; }
+        .pika-single.dark-theme .pika-table th { color: #9ca3af; }
+        .pika-single.dark-theme .pika-button { color: #d1d5db; background: transparent; border-radius: 0.25rem; }
+        .pika-single.dark-theme .pika-button:hover { color: #fff; background: #374151; }
+        .pika-single.dark-theme .is-today .pika-button { color: #818cf8; font-weight: bold; }
+        .pika-single.dark-theme .is-selected .pika-button { color: #fff; background: #4f46e5; box-shadow: none; }
+        .pika-single.dark-theme .is-disabled .pika-button { color: #4b5563; background: transparent; }
+        .pika-single.dark-theme .pika-prev, .pika-single.dark-theme .pika-next { color: #9ca3af; }
+        .pika-single.dark-theme .pika-prev:hover, .pika-single.dark-theme .pika-next:hover { background-color: #374151; }
     </style>
 </head>
 <body class="bg-gray-900 text-white antialiased">
@@ -37,7 +49,7 @@
             <!-- Login Form -->
             <div id="login-form-container" class="p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg">
                 <div>
-                    <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Войдите в свой аккаунт</h2>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-white" data-translate="loginTitle">Войдите в свой аккаунт</h2>
                 </div>
                 <form id="login-form" class="mt-8 space-y-6">
                     <div class="rounded-md shadow-sm -space-y-px">
@@ -45,17 +57,17 @@
                             <input id="login-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
                         </div>
                         <div>
-                            <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
+                            <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" data-translate-placeholder="passwordPlaceholder" placeholder="Пароль">
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-translate="loginButton">
                             Войти
                         </button>
                     </div>
                 </form>
                  <div class="text-sm text-center">
-                    <a href="#" id="show-register-link" class="font-medium text-indigo-400 hover:text-indigo-300">
+                    <a href="#" id="show-register-link" class="font-medium text-indigo-400 hover:text-indigo-300" data-translate="noAccount">
                         Нет аккаунта? Зарегистрироваться
                     </a>
                 </div>
@@ -65,7 +77,7 @@
             <!-- Register Form -->
             <div id="register-form-container" class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg hidden">
                  <div>
-                    <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Создать новый аккаунт</h2>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-white" data-translate="createAccountTitle">Создать новый аккаунт</h2>
                 </div>
                 <form id="register-form" class="mt-8 space-y-6">
                      <div class="rounded-md shadow-sm -space-y-px">
@@ -73,17 +85,17 @@
                             <input id="register-email" name="email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
                         </div>
                         <div>
-                            <input id="register-password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
+                            <input id="register-password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" data-translate-placeholder="passwordPlaceholder" placeholder="Пароль">
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-translate="registerButton">
                             Зарегистрироваться
                         </button>
                     </div>
                 </form>
                  <div class="text-sm text-center">
-                    <a href="#" id="show-login-link" class="font-medium text-indigo-400 hover:text-indigo-300">
+                    <a href="#" id="show-login-link" class="font-medium text-indigo-400 hover:text-indigo-300" data-translate="haveAccount">
                         Уже есть аккаунт? Войти
                     </a>
                 </div>
@@ -91,9 +103,9 @@
 
              <!-- Success Message -->
             <div id="register-success" class="p-8 space-y-4 bg-gray-800 rounded-2xl shadow-lg hidden text-center animate-fade-in">
-                <h2 class="text-2xl font-bold text-green-400">Регистрация успешна!</h2>
-                <p class="text-gray-300">Мы отправили ссылку для подтверждения на ваш email. Пожалуйста, перейдите по ней, чтобы активировать аккаунт.</p>
-                <a href="#" id="back-to-login-link" class="font-medium text-indigo-400 hover:text-indigo-300 block pt-4">Вернуться ко входу</a>
+                <h2 class="text-2xl font-bold text-green-400" data-translate="regSuccessTitle">Регистрация успешна!</h2>
+                <p class="text-gray-300" data-translate="regSuccessMessage">Мы отправили ссылку для подтверждения на ваш email. Пожалуйста, перейдите по ней, чтобы активировать аккаунт.</p>
+                <a href="#" id="back-to-login-link" class="font-medium text-indigo-400 hover:text-indigo-300 block pt-4" data-translate="backToLogin">Вернуться ко входу</a>
             </div>
         </div>
     </div>
@@ -103,47 +115,53 @@
     <div id="app-container" class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 hidden">
         
         <header class="mb-8 text-center">
+             <div class="absolute top-4 right-4">
+                <select id="language-switcher" class="bg-gray-700 text-white border border-gray-600 rounded-md py-1 px-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="ru">Русский</option>
+                    <option value="uk">Українська</option>
+                    <option value="pl">Polski</option>
+                </select>
+            </div>
             <h1 class="text-3xl sm:text-4xl font-bold text-indigo-400">Tacho App</h1>
-            <p class="text-gray-400 mt-2">Ваш помощник для учета режима труда и отдыха</p>
+            <p class="text-gray-400 mt-2" data-translate="appSubtitle">Ваш помощник для учета режима труда и отдыха</p>
             <div id="user-info" class="mt-4 text-xs text-gray-400"></div>
         </header>
 
         <main>
-            <!-- Input Form Card -->
             <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
-                <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-4">Добавить новую запись</h2>
+                <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-4" data-translate="addEntryTitle">Добавить новую запись</h2>
                 <form id="log-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     
                     <div class="md:col-span-2">
-                        <label for="activity-type" class="block text-sm font-medium text-gray-300 mb-2">Тип деятельности</label>
+                        <label for="activity-type" class="block text-sm font-medium text-gray-300 mb-2" data-translate="activityTypeLabel">Тип деятельности</label>
                         <select id="activity-type" name="activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3"></select>
                     </div>
                     
                     <div id="activity-fields" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Длительность</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="durationLabel">Длительность</label>
                             <div class="flex gap-4">
-                                <input type="number" id="duration-hours" name="duration-hours" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Часы">
-                                <input type="number" id="duration-minutes" name="duration-minutes" min="0" max="59" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Минуты">
+                                <input type="number" id="duration-hours" name="duration-hours" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="hoursPlaceholder" placeholder="Часы">
+                                <input type="number" id="duration-minutes" name="duration-minutes" min="0" max="59" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="minutesPlaceholder" placeholder="Минуты">
                             </div>
                         </div>
 
                          <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Километраж</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="mileageLabel">Километраж</label>
                             <div class="flex gap-4">
-                                <input type="number" id="start-mileage" name="start-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Начальный">
-                                <input type="number" id="end-mileage" name="end-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Конечный">
+                                <input type="number" id="start-mileage" name="start-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="startPlaceholder" placeholder="Начальный">
+                                <input type="number" id="end-mileage" name="end-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="endPlaceholder" placeholder="Конечный">
                             </div>
                         </div>
 
                         <div>
-                            <label for="parking-cost" class="block text-sm font-medium text-gray-300 mb-2">Затраты на парковку (€)</label>
+                            <label for="parking-cost" class="block text-sm font-medium text-gray-300 mb-2" data-translate="parkingCostLabel">Затраты на парковку (€)</label>
                             <input type="number" id="parking-cost" name="parking-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="15.50">
                         </div>
                         <div>
-                            <label for="parking-comment" class="block text-sm font-medium text-gray-300 mb-2">Комментарий к парковке</label>
+                            <label for="parking-comment" class="block text-sm font-medium text-gray-300 mb-2" data-translate="parkingCommentLabel">Комментарий к парковке</label>
                             <div class="flex items-center gap-2">
-                                <input type="text" id="parking-comment" name="parking-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Название, город...">
+                                <input type="text" id="parking-comment" name="parking-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="parkingCommentPlaceholder" placeholder="Название, город...">
                                 <button type="button" id="geolocate-btn" class="p-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 </button>
@@ -151,17 +169,17 @@
                         </div>
 
                         <div>
-                            <label for="other-cost" class="block text-sm font-medium text-gray-300 mb-2">Прочие расходы (€)</label>
+                            <label for="other-cost" class="block text-sm font-medium text-gray-300 mb-2" data-translate="otherCostsLabel">Прочие расходы (€)</label>
                             <input type="number" id="other-cost" name="other-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="5.25">
                         </div>
                         <div>
-                            <label for="other-cost-comment" class="block text-sm font-medium text-gray-300 mb-2">Комментарий к расходам</label>
-                            <input type="text" id="other-cost-comment" name="other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Оплата дороги, мойка...">
+                            <label for="other-cost-comment" class="block text-sm font-medium text-gray-300 mb-2" data-translate="otherCostsCommentLabel">Комментарий к расходам</label>
+                            <input type="text" id="other-cost-comment" name="other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="otherCostsCommentPlaceholder" placeholder="Оплата дороги, мойка...">
                         </div>
                     </div>
 
                     <div class="md:col-span-2">
-                         <button type="submit" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500">
+                         <button type="submit" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500" data-translate="saveEntryButton">
                             Сохранить запись
                         </button>
                     </div>
@@ -169,28 +187,28 @@
             </div>
             
             <div id="report-section" class="mb-12">
-                <h2 class="text-2xl font-semibold mb-6">Общий отчет</h2>
+                <h2 class="text-2xl font-semibold mb-6" data-translate="overallReportTitle">Общий отчет</h2>
                 <div class="bg-gray-800/50 p-4 rounded-lg mb-6 flex flex-wrap items-end gap-4">
                     <div class="flex-grow">
-                        <label for="filter-start-date" class="block text-sm font-medium text-gray-400 mb-1">Начало периода</label>
+                        <label for="filter-start-date" class="block text-sm font-medium text-gray-400 mb-1" data-translate="periodStartLabel">Начало периода</label>
                         <input type="date" id="filter-start-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2">
                     </div>
                      <div class="flex-grow">
-                        <label for="filter-end-date" class="block text-sm font-medium text-gray-400 mb-1">Конец периода</label>
+                        <label for="filter-end-date" class="block text-sm font-medium text-gray-400 mb-1" data-translate="periodEndLabel">Конец периода</label>
                         <input type="date" id="filter-end-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2">
                     </div>
-                    <button id="apply-filter-btn" class="flex-shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Применить фильтр</button>
+                    <button id="apply-filter-btn" class="flex-shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg" data-translate="applyFilterButton">Применить фильтр</button>
                 </div>
 
                 <div id="report-container">
-                     <p id="loading-state-report" class="text-center text-gray-500 py-8">Формирование общего отчета...</p>
+                     <p id="loading-state-report" class="text-center text-gray-500 py-8" data-translate="loadingReport">Формирование общего отчета...</p>
                 </div>
             </div>
 
             <div>
-                <h2 class="text-2xl font-semibold mb-6">История записей</h2>
+                <h2 class="text-2xl font-semibold mb-6" data-translate="historyTitle">История записей</h2>
                 <div id="log-entries" class="space-y-8">
-                     <p id="loading-state-logs" class="text-center text-gray-500 py-8">Загрузка данных...</p>
+                     <p id="loading-state-logs" class="text-center text-gray-500 py-8" data-translate="loadingEntries">Загрузка данных...</p>
                 </div>
             </div>
         </main>
@@ -199,34 +217,34 @@
     <!-- Edit Modal -->
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden animate-fade-in">
         <div class="bg-gray-800 rounded-2xl shadow-lg w-full max-w-lg p-6">
-            <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-4">Редактировать запись</h2>
+            <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-4" data-translate="editEntryTitle">Редактировать запись</h2>
             <form id="edit-log-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                  <input type="hidden" id="edit-log-id">
                  <div class="md:col-span-2">
-                    <label for="edit-activity-type" class="block text-sm font-medium text-gray-300 mb-2">Тип деятельности</label>
+                    <label for="edit-activity-type" class="block text-sm font-medium text-gray-300 mb-2" data-translate="activityTypeLabel">Тип деятельности</label>
                     <select id="edit-activity-type" name="edit-activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3"></select>
                 </div>
                  <div id="edit-activity-fields" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Длительность</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="durationLabel">Длительность</label>
                         <div class="flex gap-4">
-                            <input type="number" id="edit-duration-hours" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Часы">
-                            <input type="number" id="edit-duration-minutes" min="0" max="59" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Минуты">
+                            <input type="number" id="edit-duration-hours" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="hoursPlaceholder" placeholder="Часы">
+                            <input type="number" id="edit-duration-minutes" min="0" max="59" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="minutesPlaceholder" placeholder="Минуты">
                         </div>
                     </div>
                      <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Километраж</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="mileageLabel">Километраж</label>
                         <div class="flex gap-4">
-                            <input type="number" id="edit-start-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Начальный">
-                            <input type="number" id="edit-end-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Конечный">
+                            <input type="number" id="edit-start-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="startPlaceholder" placeholder="Начальный">
+                            <input type="number" id="edit-end-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" data-translate-placeholder="endPlaceholder" placeholder="Конечный">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Затраты на парковку (€)</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="parkingCostLabel">Затраты на парковку (€)</label>
                         <input type="number" id="edit-parking-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Комментарий к парковке</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="parkingCommentLabel">Комментарий к парковке</label>
                         <div class="flex items-center gap-2">
                             <input type="text" id="edit-parking-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
                             <button type="button" id="edit-geolocate-btn" class="p-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">
@@ -235,17 +253,17 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Прочие расходы (€)</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="otherCostsLabel">Прочие расходы (€)</label>
                         <input type="number" id="edit-other-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Комментарий к расходам</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-2" data-translate="otherCostsCommentLabel">Комментарий к расходам</label>
                         <input type="text" id="edit-other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3">
                     </div>
                 </div>
                 <div class="md:col-span-2 flex justify-end gap-4 mt-4">
-                    <button type="button" id="cancel-edit-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">Отмена</button>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Сохранить изменения</button>
+                    <button type="button" id="cancel-edit-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg" data-translate="cancelButton">Отмена</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg" data-translate="saveChangesButton">Сохранить изменения</button>
                 </div>
             </form>
         </div>
@@ -282,57 +300,206 @@
         let supabase;
         let allDocsData = [];
         let currentUserId = null;
+        let currentLanguage = 'ru';
 
-        const appContainer = document.getElementById('app-container');
-        const logForm = document.getElementById('log-form');
-        const activityTypeSelect = document.getElementById('activity-type');
-        const activityFields = document.getElementById('activity-fields');
-        const logEntriesContainer = document.getElementById('log-entries');
-        const reportContainer = document.getElementById('report-container');
-        const logEntryTemplate = document.getElementById('log-entry-template');
-        const userInfoDiv = document.getElementById('user-info');
-        const filterStartDateInput = document.getElementById('filter-start-date');
-        const filterEndDateInput = document.getElementById('filter-end-date');
-        const applyFilterBtn = document.getElementById('apply-filter-btn');
-        const geolocateBtn = document.getElementById('geolocate-btn');
-
-        const authScreen = document.getElementById('auth-screen');
-        const authFormsWrapper = document.getElementById('auth-forms-wrapper');
-        const loginFormContainer = document.getElementById('login-form-container');
-        const loginForm = document.getElementById('login-form');
-        const registerFormContainer = document.getElementById('register-form-container');
-        const registerForm = document.getElementById('register-form');
-        const showRegisterLink = document.getElementById('show-register-link');
-        const showLoginLink = document.getElementById('show-login-link');
-        const authError = document.getElementById('auth-error');
-        const registerSuccessDiv = document.getElementById('register-success');
-        const backToLoginLink = document.getElementById('back-to-login-link');
+        // --- DOM Elements ---
+        const allElements = {
+            appContainer: document.getElementById('app-container'),
+            logForm: document.getElementById('log-form'),
+            activityTypeSelect: document.getElementById('activity-type'),
+            activityFields: document.getElementById('activity-fields'),
+            logEntriesContainer: document.getElementById('log-entries'),
+            reportContainer: document.getElementById('report-container'),
+            logEntryTemplate: document.getElementById('log-entry-template'),
+            userInfoDiv: document.getElementById('user-info'),
+            filterStartDateInput: document.getElementById('filter-start-date'),
+            filterEndDateInput: document.getElementById('filter-end-date'),
+            applyFilterBtn: document.getElementById('apply-filter-btn'),
+            geolocateBtn: document.getElementById('geolocate-btn'),
+            authScreen: document.getElementById('auth-screen'),
+            authFormsWrapper: document.getElementById('auth-forms-wrapper'),
+            loginFormContainer: document.getElementById('login-form-container'),
+            loginForm: document.getElementById('login-form'),
+            registerFormContainer: document.getElementById('register-form-container'),
+            registerForm: document.getElementById('register-form'),
+            showRegisterLink: document.getElementById('show-register-link'),
+            showLoginLink: document.getElementById('show-login-link'),
+            authError: document.getElementById('auth-error'),
+            registerSuccessDiv: document.getElementById('register-success'),
+            backToLoginLink: document.getElementById('back-to-login-link'),
+            editModal: document.getElementById('edit-modal'),
+            editLogForm: document.getElementById('edit-log-form'),
+            cancelEditBtn: document.getElementById('cancel-edit-btn'),
+            editActivityFields: document.getElementById('edit-activity-fields'),
+            editActivityTypeSelect: document.getElementById('edit-activity-type'),
+            editGeolocateBtn: document.getElementById('edit-geolocate-btn'),
+            languageSwitcher: document.getElementById('language-switcher')
+        };
         
-        const editModal = document.getElementById('edit-modal');
-        const editLogForm = document.getElementById('edit-log-form');
-        const cancelEditBtn = document.getElementById('cancel-edit-btn');
-        const editActivityFields = document.getElementById('edit-activity-fields');
-        const editActivityTypeSelect = document.getElementById('edit-activity-type');
-        const editGeolocateBtn = document.getElementById('edit-geolocate-btn');
-
-        const activityTypes = ['Начало смены', 'Конец смены', 'Вождение', 'Работа', 'Ожидание', 'Отдых'];
-
-        const activityStyles = {
-            'Начало смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`, color: 'bg-green-900/50' },
-            'Конец смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>`, color: 'bg-red-900/50' },
-            'Вождение': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/><path d="M10 9V7a4 4 0 018 0v2h-8z"/></svg>`, color: 'bg-blue-900/50' },
-            'Работа': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`, color: 'bg-green-900/50' },
-            'Ожидание': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`, color: 'bg-yellow-900/50' },
-            'Отдых': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05a9 9 0 11-12.89-12.89A9 9 0 0121.44 11.05z"/></svg>`, color: 'bg-purple-900/50' }
+        // --- Translations ---
+        const translations = {
+            ru: {
+                loginTitle: 'Войдите в свой аккаунт',
+                passwordPlaceholder: 'Пароль',
+                loginButton: 'Войти',
+                noAccount: 'Нет аккаунта? Зарегистрироваться',
+                createAccountTitle: 'Создать новый аккаунт',
+                registerButton: 'Зарегистрироваться',
+                haveAccount: 'Уже есть аккаунт? Войти',
+                regSuccessTitle: 'Регистрация успешна!',
+                regSuccessMessage: 'Мы отправили ссылку для подтверждения на ваш email. Пожалуйста, перейдите по ней, чтобы активировать аккаунт.',
+                backToLogin: 'Вернуться ко входу',
+                appSubtitle: 'Ваш помощник для учета режима труда и отдыха',
+                addEntryTitle: 'Добавить новую запись',
+                activityTypeLabel: 'Тип деятельности',
+                durationLabel: 'Длительность',
+                hoursPlaceholder: 'Часы',
+                minutesPlaceholder: 'Минуты',
+                mileageLabel: 'Километраж',
+                startPlaceholder: 'Начальный',
+                endPlaceholder: 'Конечный',
+                parkingCostLabel: 'Затраты на парковку (€)',
+                parkingCommentLabel: 'Комментарий к парковке',
+                parkingCommentPlaceholder: 'Название, город...',
+                otherCostsLabel: 'Прочие расходы (€)',
+                otherCostsCommentLabel: 'Комментарий к расходам',
+                otherCostsCommentPlaceholder: 'Оплата дороги, мойка...',
+                saveEntryButton: 'Сохранить запись',
+                overallReportTitle: 'Общий отчет',
+                periodStartLabel: 'Начало периода',
+                periodEndLabel: 'Конец периода',
+                applyFilterButton: 'Применить фильтр',
+                historyTitle: 'История записей',
+                loadingReport: 'Формирование общего отчета...',
+                loadingEntries: 'Загрузка данных...',
+                editEntryTitle: 'Редактировать запись',
+                cancelButton: 'Отмена',
+                saveChangesButton: 'Сохранить изменения',
+                activityTypes: ['Начало смены', 'Конец смены', 'Вождение', 'Работа', 'Ожидание', 'Отдых'],
+                loggedInAs: 'Вы вошли как:',
+                logoutButton: 'Выйти',
+            },
+            uk: {
+                loginTitle: 'Увійдіть у свій обліковий запис',
+                passwordPlaceholder: 'Пароль',
+                loginButton: 'Увійти',
+                noAccount: 'Немає акаунту? Зареєструватися',
+                createAccountTitle: 'Створити новий акаунт',
+                registerButton: 'Зареєструватися',
+                haveAccount: 'Вже є акаунт? Увійти',
+                regSuccessTitle: 'Реєстрація успішна!',
+                regSuccessMessage: 'Ми надіслали посилання для підтвердження на ваш email. Будь ласка, перейдіть за ним, щоб активувати акаунт.',
+                backToLogin: 'Повернутися до входу',
+                appSubtitle: 'Ваш помічник для обліку режиму праці та відпочинку',
+                addEntryTitle: 'Додати новий запис',
+                activityTypeLabel: 'Тип діяльності',
+                durationLabel: 'Тривалість',
+                hoursPlaceholder: 'Години',
+                minutesPlaceholder: 'Хвилини',
+                mileageLabel: 'Кілометраж',
+                startPlaceholder: 'Початковий',
+                endPlaceholder: 'Кінцевий',
+                parkingCostLabel: 'Витрати на паркування (€)',
+                parkingCommentLabel: 'Коментар до паркування',
+                parkingCommentPlaceholder: 'Назва, місто...',
+                otherCostsLabel: 'Інші витрати (€)',
+                otherCostsCommentLabel: 'Коментар до витрат',
+                otherCostsCommentPlaceholder: 'Оплата дороги, мийка...',
+                saveEntryButton: 'Зберегти запис',
+                overallReportTitle: 'Загальний звіт',
+                periodStartLabel: 'Початок періоду',
+                periodEndLabel: 'Кінець періоду',
+                applyFilterButton: 'Застосувати фільтр',
+                historyTitle: 'Історія записів',
+                loadingReport: 'Формування загального звіту...',
+                loadingEntries: 'Завантаження даних...',
+                editEntryTitle: 'Редагувати запис',
+                cancelButton: 'Скасувати',
+                saveChangesButton: 'Зберегти зміни',
+                activityTypes: ['Початок зміни', 'Кінець зміни', 'Водіння', 'Робота', 'Очікування', 'Відпочинок'],
+                loggedInAs: 'Ви увійшли як:',
+                logoutButton: 'Вийти',
+            },
+            pl: {
+                loginTitle: 'Zaloguj się na swoje konto',
+                passwordPlaceholder: 'Hasło',
+                loginButton: 'Zaloguj się',
+                noAccount: 'Nie masz konta? Zarejestruj się',
+                createAccountTitle: 'Utwórz nowe konto',
+                registerButton: 'Zarejestruj się',
+                haveAccount: 'Masz już konto? Zaloguj się',
+                regSuccessTitle: 'Rejestracja udana!',
+                regSuccessMessage: 'Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto.',
+                backToLogin: 'Powrót do logowania',
+                appSubtitle: 'Twój asystent do śledzenia czasu pracy i odpoczynku',
+                addEntryTitle: 'Dodaj nowy wpis',
+                activityTypeLabel: 'Rodzaj czynności',
+                durationLabel: 'Czas trwania',
+                hoursPlaceholder: 'Godziny',
+                minutesPlaceholder: 'Minuty',
+                mileageLabel: 'Przebieg',
+                startPlaceholder: 'Początkowy',
+                endPlaceholder: 'Końcowy',
+                parkingCostLabel: 'Koszty parkowania (€)',
+                parkingCommentLabel: 'Komentarz do parkowania',
+                parkingCommentPlaceholder: 'Nazwa, miasto...',
+                otherCostsLabel: 'Inne koszty (€)',
+                otherCostsCommentLabel: 'Komentarz do kosztów',
+                otherCostsCommentPlaceholder: 'Opłata drogowa, myjnia...',
+                saveEntryButton: 'Zapisz wpis',
+                overallReportTitle: 'Raport ogólny',
+                periodStartLabel: 'Początek okresu',
+                periodEndLabel: 'Koniec okresu',
+                applyFilterButton: 'Zastosuj filtr',
+                historyTitle: 'Historia wpisów',
+                loadingReport: 'Generowanie raportu...',
+                loadingEntries: 'Ładowanie danych...',
+                editEntryTitle: 'Edytuj wpis',
+                cancelButton: 'Anuluj',
+                saveChangesButton: 'Zapisz zmiany',
+                activityTypes: ['Początek zmiany', 'Koniec zmiany', 'Jazda', 'Praca', 'Oczekiwanie', 'Odpoczynek'],
+                loggedInAs: 'Zalogowano jako:',
+                logoutButton: 'Wyloguj',
+            }
         };
 
-        const toggleActivityFields = (formType = 'main') => {
-            const select = formType === 'edit' ? editActivityTypeSelect : activityTypeSelect;
-            const fields = formType === 'edit' ? editActivityFields : activityFields;
-            const selectedType = select.value;
-            fields.style.display = (selectedType === 'Начало смены' || selectedType === 'Конец смены') ? 'none' : 'grid';
-        };
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('tachoAppLanguage', lang);
+            allElements.languageSwitcher.value = lang;
+            updateUIText();
+        }
 
+        function t(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        function updateUIText() {
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-translate-placeholder');
+                el.placeholder = t(key);
+            });
+            
+            // Update activity dropdowns
+            const translatedActivityTypes = t('activityTypes');
+            allElements.activityTypeSelect.innerHTML = '';
+            allElements.editActivityTypeSelect.innerHTML = '';
+            translatedActivityTypes.forEach(type => {
+                allElements.activityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                allElements.editActivityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+            });
+
+            // Re-render data to update dynamic text like dates
+            if(allDocsData.length > 0) {
+                applyFilter();
+            }
+        }
+
+        // --- Helper Functions --- (unchanged)
         const formatMinutes = (totalMinutes) => {
             if (isNaN(totalMinutes) || totalMinutes <= 0) return '0 мин';
             const hours = Math.floor(totalMinutes / 60);
@@ -343,18 +510,11 @@
             return parts.join(' ');
         };
 
+        // --- Data Fetching and Rendering --- (unchanged from previous version)
         async function fetchAndRenderLogs() {
             if (!currentUserId || !supabase) return;
-            const { data, error } = await supabase
-                .from('logs')
-                .select('*')
-                .eq('user_id', currentUserId)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('Error fetching logs:', error);
-                return;
-            }
+            const { data, error } = await supabase.from('logs').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
+            if (error) { console.error('Error fetching logs:', error); return; }
             allDocsData = data;
             applyFilter();
         }
@@ -363,10 +523,8 @@
             let filteredData = allDocsData;
             const startDate = filterStartDateInput.value ? new Date(filterStartDateInput.value) : null;
             const endDate = filterEndDateInput.value ? new Date(filterEndDateInput.value) : null;
-
             if (startDate) startDate.setHours(0, 0, 0, 0);
             if (endDate) endDate.setHours(23, 59, 59, 999);
-
             if (startDate || endDate) {
                 filteredData = allDocsData.filter(doc => {
                     const docDate = new Date(doc.created_at);
@@ -381,9 +539,9 @@
             reportContainer.innerHTML = '';
 
             if (docsToDisplay.length === 0) {
-                const stateText = (filterStartDateInput.value || filterEndDateInput.value) ? 'Нет записей за выбранный период.' : 'Записей пока нет. Добавьте первую!';
-                logEntriesContainer.innerHTML = `<p class="text-center text-gray-500 py-8">${stateText}</p>`;
-                reportContainer.innerHTML = `<p class="text-center text-gray-500 py-8">Нет данных для отчета.</p>`;
+                const stateText = (filterStartDateInput.value || filterEndDateInput.value) ? t('noEntriesForPeriod') : t('noEntriesYet');
+                logEntriesContainer.innerHTML = `<p class="text-center text-gray-500 py-8">${stateText || 'Нет записей'}</p>`;
+                reportContainer.innerHTML = `<p class="text-center text-gray-500 py-8">${t('noReportData') || 'Нет данных для отчета'}</p>`;
                 return;
             }
 
@@ -404,7 +562,7 @@
         
         function renderOverallReport(docs, numberOfDays) {
             const summary = docs.reduce((acc, doc) => {
-                if(doc.activity_type !== 'Начало смены' && doc.activity_type !== 'Конец смены') {
+                if(activityTypes.slice(2).includes(doc.activity_type)) { // Only count work/drive etc.
                     acc.totalDuration[doc.activity_type] = (acc.totalDuration[doc.activity_type] || 0) + (doc.duration || 0);
                 }
                 if (doc.start_mileage != null && doc.end_mileage != null && doc.end_mileage > doc.start_mileage) {
@@ -420,13 +578,13 @@
             reportCard.className = 'bg-gray-800 p-5 rounded-lg shadow-lg animate-fade-in';
             reportCard.innerHTML = `
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300">
-                    <p><strong>Отработано дней:</strong> ${numberOfDays}</p>
-                    <p><strong>Общий пробег:</strong> ${summary.totalDistance} км</p>
-                    <p><strong>Общее вождение:</strong> ${formatMinutes(summary.totalDuration['Вождение'])}</p>
-                    <p><strong>Общая работа:</strong> ${formatMinutes(summary.totalDuration['Работа'])}</p>
-                    <p><strong>Общее ожидание:</strong> ${formatMinutes(summary.totalDuration['Ожидание'])}</p>
-                    <p><strong>Общий отдых:</strong> ${formatMinutes(summary.totalDuration['Отдых'])}</p>
-                    <p class="sm:col-span-2"><strong>Общие расходы:</strong> <span class="font-bold text-white">${(summary.totalParkingCost + summary.totalOtherCost).toFixed(2)} €</span></p>
+                    <p><strong>${t('daysWorked') || 'Отработано дней'}:</strong> ${numberOfDays}</p>
+                    <p><strong>${t('totalMileage') || 'Общий пробег'}:</strong> ${summary.totalDistance} км</p>
+                    <p><strong>${t('activityTypes')[2]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[2]])}</p>
+                    <p><strong>${t('activityTypes')[3]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[3]])}</p>
+                    <p><strong>${t('activityTypes')[4]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[4]])}</p>
+                    <p><strong>${t('activityTypes')[5]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[5]])}</p>
+                    <p class="sm:col-span-2"><strong>${t('totalExpenses') || 'Общие расходы'}:</strong> <span class="font-bold text-white">${(summary.totalParkingCost + summary.totalOtherCost).toFixed(2)} €</span></p>
                 </div>
             `;
             reportContainer.appendChild(reportCard);
@@ -434,16 +592,14 @@
 
         function renderDayLog(dateKey, docs, isFirst) {
             const dayContainer = document.createElement('div');
-            
             const headerButton = document.createElement('button');
             headerButton.className = 'w-full flex justify-between items-center text-left text-xl font-semibold text-indigo-300 border-b border-gray-700 pb-2 mb-2 cursor-pointer';
             const date = new Date(dateKey);
             date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
             headerButton.innerHTML = `
-                <span>${date.toLocaleDateString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                <span>${date.toLocaleDateString(currentLanguage, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                 <svg class="chevron-icon h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
             `;
-            
             const entriesWrapper = document.createElement('div');
             entriesWrapper.className = 'day-entries-wrapper space-y-4';
             headerButton.addEventListener('click', () => {
@@ -451,11 +607,9 @@
                 headerButton.querySelector('.chevron-icon').classList.toggle('rotated', isCollapsed);
                 entriesWrapper.style.maxHeight = isCollapsed ? '0px' : entriesWrapper.scrollHeight + 'px';
             });
-
             docs.forEach(doc => renderLogEntry(doc, entriesWrapper));
             dayContainer.append(headerButton, entriesWrapper);
             logEntriesContainer.appendChild(dayContainer);
-            
             if (!isFirst) {
                entriesWrapper.classList.add('collapsed');
                headerButton.querySelector('.chevron-icon').classList.add('rotated');
@@ -467,20 +621,17 @@
 
         function renderLogEntry(doc, parentContainer) {
             const entryElement = logEntryTemplate.content.cloneNode(true).firstElementChild;
-            const style = activityStyles[doc.activity_type] || activityStyles['Работа'];
-            
+            const style = activityStyles[doc.activity_type] || activityStyles[t('activityTypes')[3]];
             entryElement.querySelector('[data-icon-container]').innerHTML = style.icon;
             entryElement.querySelector('[data-icon-container]').className = `p-3 rounded-full mt-1 shrink-0 ${style.color}`;
             entryElement.querySelector('[data-activity-type]').textContent = doc.activity_type || 'Неизвестно';
-            entryElement.querySelector('[data-timestamp]').textContent = new Date(doc.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-            
+            entryElement.querySelector('[data-timestamp]').textContent = new Date(doc.created_at).toLocaleTimeString(currentLanguage, { hour: '2-digit', minute: '2-digit' });
             const durationEl = entryElement.querySelector('[data-duration]');
-            if (doc.activity_type !== 'Начало смены' && doc.activity_type !== 'Конец смены') {
+            if (activityTypes.slice(2).includes(doc.activity_type)) {
                 durationEl.textContent = formatMinutes(doc.duration);
             } else {
                 durationEl.style.display = 'none';
             }
-            
             const mileageEl = entryElement.querySelector('[data-mileage]');
             if (doc.start_mileage != null && doc.end_mileage != null) {
                 const diff = doc.end_mileage - doc.start_mileage;
@@ -488,40 +639,32 @@
             } else {
                 mileageEl.style.display = 'none';
             }
-
             const costsContainer = entryElement.querySelector('[data-costs-container]');
             costsContainer.innerHTML = '';
             if (doc.parking_cost > 0) {
-                costsContainer.innerHTML += `<p>Парковка: <span class="font-semibold text-white">${doc.parking_cost.toFixed(2)} €</span> ${doc.parking_comment ? `<span class="text-gray-400">- ${doc.parking_comment}</span>` : ''}</p>`;
+                costsContainer.innerHTML += `<p>${t('parking') || 'Парковка'}: <span class="font-semibold text-white">${doc.parking_cost.toFixed(2)} €</span> ${doc.parking_comment ? `<span class="text-gray-400">- ${doc.parking_comment}</span>` : ''}</p>`;
             }
             if (doc.other_cost > 0) {
-                 costsContainer.innerHTML += `<p>Прочее: <span class="font-semibold text-white">${doc.other_cost.toFixed(2)} €</span> ${doc.other_cost_comment ? `<span class="text-gray-400">- ${doc.other_cost_comment}</span>` : ''}</p>`;
+                 costsContainer.innerHTML += `<p>${t('other') || 'Прочее'}: <span class="font-semibold text-white">${doc.other_cost.toFixed(2)} €</span> ${doc.other_cost_comment ? `<span class="text-gray-400">- ${doc.other_cost_comment}</span>` : ''}</p>`;
             }
-            
             entryElement.querySelector('[data-edit-button]').addEventListener('click', () => openEditModal(doc));
             entryElement.querySelector('[data-delete-button]').addEventListener('click', async () => {
-                if (window.confirm('Вы уверены, что хотите удалить эту запись?')) {
+                if (window.confirm(t('confirmDelete') || 'Вы уверены, что хотите удалить эту запись?')) {
                     if (!supabase) return;
                     const { error } = await supabase.from('logs').delete().match({ id: doc.id });
-                    if (error) {
-                        console.error('Error deleting log:', error);
-                        alert("Произошла ошибка при удалении записи.");
-                    } else {
-                        fetchAndRenderLogs();
-                    }
+                    if (error) { console.error('Error deleting log:', error); alert(t('errorDelete') || "Произошла ошибка при удалении записи.");
+                    } else { fetchAndRenderLogs(); }
                 }
             });
-
             parentContainer.appendChild(entryElement);
         }
 
+        // --- Event Handlers & Initializers ---
         function openEditModal(doc) {
             editLogForm.elements['edit-log-id'].value = doc.id;
             editLogForm.elements['edit-activity-type'].value = doc.activity_type;
-
             const hours = doc.duration ? Math.floor(doc.duration / 60) : '';
             const minutes = doc.duration ? doc.duration % 60 : '';
-            
             editLogForm.elements['edit-duration-hours'].value = hours;
             editLogForm.elements['edit-duration-minutes'].value = minutes;
             editLogForm.elements['edit-start-mileage'].value = doc.start_mileage;
@@ -530,183 +673,47 @@
             editLogForm.elements['edit-parking-comment'].value = doc.parking_comment;
             editLogForm.elements['edit-other-cost'].value = doc.other_cost;
             editLogForm.elements['edit-other-cost-comment'].value = doc.other_cost_comment;
-            
             toggleActivityFields('edit');
             editModal.classList.remove('hidden');
         }
 
-        function closeEditModal() {
-            editModal.classList.add('hidden');
-        }
+        function closeEditModal() { editModal.classList.add('hidden'); }
 
         async function handleGeolocation(button, inputField) {
             const originalIcon = button.innerHTML;
             button.innerHTML = `<div class="w-5 h-5 border-2 border-gray-400 border-t-white rounded-full animate-spin"></div>`;
             button.disabled = true;
-
             if (!navigator.geolocation) {
-                alert("Геолокация не поддерживается вашим браузером.");
+                alert(t('geolocationNotSupported') || "Геолокация не поддерживается вашим браузером.");
                 button.innerHTML = originalIcon;
                 button.disabled = false;
                 return;
             }
-
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ru`);
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=${currentLanguage}`);
                     const data = await response.json();
                     if (data && data.address) {
                         const { road, house_number, city, town, village, county } = data.address;
-                        const locationString = [road, house_number, city || town || village || county].filter(Boolean).join(', ');
-                        inputField.value = locationString;
+                        inputField.value = [road, house_number, city || town || village || county].filter(Boolean).join(', ');
                     } else {
                         inputField.value = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
                     }
                 } catch (error) {
                     console.error("Reverse geocoding failed:", error);
-                    alert("Не удалось определить адрес. Попробуйте снова.");
+                    alert(t('errorGeocoding') || "Не удалось определить адрес. Попробуйте снова.");
                 } finally {
                     button.innerHTML = originalIcon;
                     button.disabled = false;
                 }
             }, (error) => {
-                alert("Не удалось получить геолокацию. Убедитесь, что вы разрешили доступ в настройках браузера.");
+                alert(t('errorGeolocationPermission') || "Не удалось получить геолокацию. Убедитесь, что вы разрешили доступ в настройках браузера.");
                 button.innerHTML = originalIcon;
                 button.disabled = false;
             });
         }
-
-        logForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUserId || !supabase) return alert("Пользователь не авторизован или Supabase не инициализирован.");
-            
-            const activity = activityTypeSelect.value;
-            let newLog = { activity_type: activity, user_id: currentUserId };
-
-            if (activity !== 'Начало смены' && activity !== 'Конец смены') {
-                const hours = parseInt(logForm.elements['duration-hours'].value, 10) || 0;
-                const minutes = parseInt(logForm.elements['duration-minutes'].value, 10) || 0;
-                const totalDurationInMinutes = (hours * 60) + minutes;
-                if (totalDurationInMinutes <= 0) return alert("Пожалуйста, введите корректную длительность.");
-
-                const startMileage = parseInt(logForm.elements['start-mileage'].value, 10);
-                const endMileage = parseInt(logForm.elements['end-mileage'].value, 10);
-                if (!isNaN(startMileage) && !isNaN(endMileage) && endMileage < startMileage) return alert("Конечный километраж не может быть меньше начального.");
-
-                Object.assign(newLog, {
-                    duration: totalDurationInMinutes,
-                    start_mileage: !isNaN(startMileage) ? startMileage : null,
-                    end_mileage: !isNaN(endMileage) ? endMileage : null,
-                    parking_cost: parseFloat(logForm.elements['parking-cost'].value) || 0,
-                    parking_comment: logForm.elements['parking-comment'].value.trim(),
-                    other_cost: parseFloat(logForm.elements['other-cost'].value) || 0,
-                    other_cost_comment: logForm.elements['other-cost-comment'].value.trim(),
-                });
-            }
-            
-            const { error } = await supabase.from('logs').insert([newLog]);
-            if (error) {
-                console.error("Error adding document: ", error);
-                alert("Произошла ошибка при сохранении данных.");
-            } else {
-                logForm.reset();
-                toggleActivityFields();
-                activityTypeSelect.focus();
-                fetchAndRenderLogs();
-            }
-        });
         
-        editLogForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const logId = editLogForm.elements['edit-log-id'].value;
-            if (!logId || !supabase) return;
-
-            const activity = editActivityTypeSelect.value;
-            let updatedLog = { activity_type: activity };
-
-            if (activity !== 'Начало смены' && activity !== 'Конец смены') {
-                const hours = parseInt(editLogForm.elements['edit-duration-hours'].value, 10) || 0;
-                const minutes = parseInt(editLogForm.elements['edit-duration-minutes'].value, 10) || 0;
-                updatedLog.duration = (hours * 60) + minutes;
-
-                const startMileage = parseInt(editLogForm.elements['edit-start-mileage'].value, 10);
-                const endMileage = parseInt(editLogForm.elements['edit-end-mileage'].value, 10);
-                
-                updatedLog.start_mileage = !isNaN(startMileage) ? startMileage : null;
-                updatedLog.end_mileage = !isNaN(endMileage) ? endMileage : null;
-                updatedLog.parking_cost = parseFloat(editLogForm.elements['edit-parking-cost'].value) || 0;
-                updatedLog.parking_comment = editLogForm.elements['edit-parking-comment'].value.trim();
-                updatedLog.other_cost = parseFloat(editLogForm.elements['edit-other-cost'].value) || 0;
-                updatedLog.other_cost_comment = editLogForm.elements['edit-other-cost-comment'].value.trim();
-            } else {
-                updatedLog.duration = null;
-                updatedLog.start_mileage = null;
-                updatedLog.end_mileage = null;
-                updatedLog.parking_cost = null;
-                updatedLog.parking_comment = null;
-                updatedLog.other_cost = null;
-                updatedLog.other_cost_comment = null;
-            }
-
-            const { error } = await supabase.from('logs').update(updatedLog).eq('id', logId);
-
-            if(error) {
-                console.error('Error updating log:', error);
-                alert('Ошибка при обновлении записи.');
-            } else {
-                closeEditModal();
-                fetchAndRenderLogs();
-            }
-        });
-        
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            authError.textContent = '';
-            const email = loginForm.elements.email.value;
-            const password = loginForm.elements.password.value;
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) authError.textContent = 'Ошибка входа: ' + error.message;
-        });
-
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            authError.textContent = '';
-            const email = registerForm.elements.email.value;
-            const password = registerForm.elements.password.value;
-            const { error } = await supabase.auth.signUp({ email, password });
-
-            if (error) {
-                authError.textContent = 'Ошибка регистрации: ' + error.message;
-            } else {
-                loginFormContainer.classList.add('hidden');
-                registerFormContainer.classList.add('hidden');
-                registerSuccessDiv.classList.remove('hidden');
-                registerForm.reset();
-            }
-        });
-
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginFormContainer.classList.add('hidden');
-            registerSuccessDiv.classList.add('hidden');
-            registerFormContainer.classList.remove('hidden');
-            authError.textContent = '';
-        });
-
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerFormContainer.classList.add('hidden');
-            registerSuccessDiv.classList.add('hidden');
-            loginFormContainer.classList.remove('hidden');
-        });
-        
-        backToLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerSuccessDiv.classList.add('hidden');
-            loginFormContainer.classList.remove('hidden');
-        });
-
         async function main() {
             const supabaseUrl = 'https://fdefnbmqbljhkokmflya.supabase.co'; 
             const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZWZuYm1xYmxqaGtva21mbHlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTIyOTMsImV4cCI6MjA2NjI2ODI5M30.S83ZOKO77isvYaW7P79b-mgeL-AzNZD6nkqzSyZYNDU';
@@ -715,18 +722,28 @@
                 document.body.innerHTML = `<div class="h-screen flex items-center justify-center text-center text-white bg-gray-900 p-4"><p class="text-2xl">Ошибка: Конфигурация Supabase не найдена.<br>Пожалуйста, следуйте руководству, чтобы вставить ваши ключи в HTML-файл.</p></div>`;
                 return;
             }
-            
             supabase = createClient(supabaseUrl, supabaseKey);
 
+            // Language setup
+            const savedLang = localStorage.getItem('tachoAppLanguage');
+            const browserLang = navigator.language.split('-')[0];
+            if (savedLang) {
+                setLanguage(savedLang);
+            } else if (['uk', 'pl'].includes(browserLang)) {
+                setLanguage(browserLang);
+            } else {
+                setLanguage('ru');
+            }
+
+            // Auth listeners
             supabase.auth.onAuthStateChange((event, session) => {
                 if (session && session.user) {
                     currentUserId = session.user.id;
                     appContainer.classList.remove('hidden');
                     authScreen.classList.add('hidden');
-                    userInfoDiv.innerHTML = `<div class="flex items-center justify-center gap-4"><span class="text-gray-300">Вы вошли как: <span class="font-medium text-white">${session.user.email}</span></span><button id="logout-btn" class="px-3 py-1 text-xs font-medium text-indigo-100 bg-indigo-600/50 hover:bg-indigo-600/80 rounded-full shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500">Выйти</button></div>`;
-                    document.getElementById('logout-btn').addEventListener('click', async () => {
-                        await supabase.auth.signOut();
-                    });
+                    const userEmail = session.user.email;
+                    userInfoDiv.innerHTML = `<div class="flex items-center justify-center gap-4"><span class="text-gray-300">${t('loggedInAs')} <span class="font-medium text-white">${userEmail}</span></span><button id="logout-btn" class="px-3 py-1 text-xs font-medium text-indigo-100 bg-indigo-600/50 hover:bg-indigo-600/80 rounded-full shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500">${t('logoutButton')}</button></div>`;
+                    document.getElementById('logout-btn').addEventListener('click', async () => { await supabase.auth.signOut(); });
                     fetchAndRenderLogs();
                 } else {
                     currentUserId = null;
@@ -735,17 +752,85 @@
                 }
             });
 
-            activityTypes.forEach(type => {
-                activityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-                editActivityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+            // Form listeners
+            logForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentUserId || !supabase) return alert(t('notAuthorizedError') || "Пользователь не авторизован или Supabase не инициализирован.");
+                const activity = activityTypeSelect.value;
+                let newLog = { activity_type: activity, user_id: currentUserId };
+                if (activity !== t('activityTypes')[0] && activity !== t('activityTypes')[1]) {
+                    const hours = parseInt(logForm.elements['duration-hours'].value, 10) || 0;
+                    const minutes = parseInt(logForm.elements['duration-minutes'].value, 10) || 0;
+                    const totalDurationInMinutes = (hours * 60) + minutes;
+                    if (totalDurationInMinutes <= 0) return alert(t('errorDuration') || "Пожалуйста, введите корректную длительность.");
+                    const startMileage = parseInt(logForm.elements['start-mileage'].value, 10);
+                    const endMileage = parseInt(logForm.elements['end-mileage'].value, 10);
+                    if (!isNaN(startMileage) && !isNaN(endMileage) && endMileage < startMileage) return alert(t('errorMileage') || "Конечный километраж не может быть меньше начального.");
+                    Object.assign(newLog, { duration: totalDurationInMinutes, start_mileage: !isNaN(startMileage) ? startMileage : null, end_mileage: !isNaN(endMileage) ? endMileage : null, parking_cost: parseFloat(logForm.elements['parking-cost'].value) || 0, parking_comment: logForm.elements['parking-comment'].value.trim(), other_cost: parseFloat(logForm.elements['other-cost'].value) || 0, other_cost_comment: logForm.elements['other-cost-comment'].value.trim(), });
+                }
+                const { error } = await supabase.from('logs').insert([newLog]);
+                if (error) { console.error("Error adding document: ", error); alert(t('errorSaving') || "Произошла ошибка при сохранении данных.");
+                } else { logForm.reset(); toggleActivityFields(); activityTypeSelect.focus(); fetchAndRenderLogs(); }
+            });
+            editLogForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const logId = editLogForm.elements['edit-log-id'].value;
+                if (!logId || !supabase) return;
+                const activity = editActivityTypeSelect.value;
+                let updatedLog = { activity_type: activity };
+                if (activity !== t('activityTypes')[0] && activity !== t('activityTypes')[1]) {
+                    const hours = parseInt(editLogForm.elements['edit-duration-hours'].value, 10) || 0;
+                    const minutes = parseInt(editLogForm.elements['edit-duration-minutes'].value, 10) || 0;
+                    updatedLog.duration = (hours * 60) + minutes;
+                    const startMileage = parseInt(editLogForm.elements['edit-start-mileage'].value, 10);
+                    const endMileage = parseInt(editLogForm.elements['edit-end-mileage'].value, 10);
+                    updatedLog.start_mileage = !isNaN(startMileage) ? startMileage : null;
+                    updatedLog.end_mileage = !isNaN(endMileage) ? endMileage : null;
+                    updatedLog.parking_cost = parseFloat(editLogForm.elements['edit-parking-cost'].value) || 0;
+                    updatedLog.parking_comment = editLogForm.elements['edit-parking-comment'].value.trim();
+                    updatedLog.other_cost = parseFloat(editLogForm.elements['edit-other-cost'].value) || 0;
+                    updatedLog.other_cost_comment = editLogForm.elements['edit-other-cost-comment'].value.trim();
+                } else {
+                    updatedLog.duration = null; updatedLog.start_mileage = null; updatedLog.end_mileage = null; updatedLog.parking_cost = null; updatedLog.parking_comment = null; updatedLog.other_cost = null; updatedLog.other_cost_comment = null;
+                }
+                const { error } = await supabase.from('logs').update(updatedLog).eq('id', logId);
+                if(error) { console.error('Error updating log:', error); alert(t('errorUpdate') || 'Ошибка при обновлении записи.');
+                } else { closeEditModal(); fetchAndRenderLogs(); }
+            });
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                authError.textContent = '';
+                const email = loginForm.elements.email.value;
+                const password = loginForm.elements.password.value;
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) authError.textContent = t('errorLogin') + ": " + error.message;
+            });
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                authError.textContent = '';
+                const email = registerForm.elements.email.value;
+                const password = registerForm.elements.password.value;
+                const { error } = await supabase.auth.signUp({ email, password });
+                if (error) { authError.textContent = t('errorRegister') + ": " + error.message;
+                } else {
+                    loginFormContainer.classList.add('hidden');
+                    registerFormContainer.classList.add('hidden');
+                    registerSuccessDiv.classList.remove('hidden');
+                    registerForm.reset();
+                }
             });
 
+            // Other Event Listeners
+            showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); loginFormContainer.classList.add('hidden'); registerSuccessDiv.classList.add('hidden'); registerFormContainer.classList.remove('hidden'); authError.textContent = ''; });
+            showLoginLink.addEventListener('click', (e) => { e.preventDefault(); registerFormContainer.classList.add('hidden'); registerSuccessDiv.classList.add('hidden'); loginFormContainer.classList.remove('hidden'); authError.textContent = ''; });
+            backToLoginLink.addEventListener('click', (e) => { e.preventDefault(); registerSuccessDiv.classList.add('hidden'); loginFormContainer.classList.remove('hidden'); });
             applyFilterBtn.addEventListener('click', applyFilter);
             activityTypeSelect.addEventListener('change', () => toggleActivityFields('main'));
             editActivityTypeSelect.addEventListener('change', () => toggleActivityFields('edit'));
             cancelEditBtn.addEventListener('click', closeEditModal);
             geolocateBtn.addEventListener('click', () => handleGeolocation(geolocateBtn, document.getElementById('parking-comment')));
             editGeolocateBtn.addEventListener('click', () => handleGeolocation(editGeolocateBtn, document.getElementById('edit-parking-comment')));
+            languageSwitcher.addEventListener('change', (e) => setLanguage(e.target.value));
         }
         
         main();
