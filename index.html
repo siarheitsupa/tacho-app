@@ -662,7 +662,6 @@
             registerFormContainer.classList.add('hidden');
             registerSuccessDiv.classList.add('hidden');
             loginFormContainer.classList.remove('hidden');
-            authError.textContent = '';
         });
         
         backToLoginLink.addEventListener('click', (e) => {
@@ -687,7 +686,7 @@
                     currentUserId = session.user.id;
                     appContainer.classList.remove('hidden');
                     authScreen.classList.add('hidden');
-                    userInfoDiv.innerHTML = `<span>Вы вошли как: ${session.user.email}</span><button id="logout-btn" class="ml-4 text-indigo-400 hover:text-indigo-300">[Выйти]</button>`;
+                    userInfoDiv.innerHTML = `<div class="flex items-center justify-center gap-4"><span class="text-gray-300">Вы вошли как: <span class="font-medium text-white">${session.user.email}</span></span><button id="logout-btn" class="px-3 py-1 text-xs font-medium text-indigo-100 bg-indigo-600/50 hover:bg-indigo-600/80 rounded-full shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500">Выйти</button></div>`;
                     document.getElementById('logout-btn').addEventListener('click', async () => {
                         await supabase.auth.signOut();
                     });
