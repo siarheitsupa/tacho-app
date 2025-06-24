@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tacho App: Режим труда и отдыха</title>
+    <title>Tacho App: Режим труда и отдыха (Supabase)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
@@ -24,21 +24,81 @@
           -webkit-appearance: none; 
           margin: 0; 
         }
-        input[type=number] { -moz-appearance: textfield; }
-        .pika-single.dark-theme { color: #e5e7eb; background: #1f2937; border: 1px solid #4b5563; border-radius: 0.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .pika-single.dark-theme .pika-lendar { width: 100%; }
-        .pika-single.dark-theme .pika-select-year, .pika-single.dark-theme .pika-select-month { -webkit-appearance: none; -moz-appearance: none; appearance: none; color: #e5e7eb !important; background-color: #374151 !important; border: 1px solid #4b5563; border-radius: 0.25rem; font-size: 14px; padding: 4px 8px; margin: 0 4px; }
-        .pika-single.dark-theme .pika-select-month option, .pika-single.dark-theme .pika-select-year option { background-color: #374151; color: #e5e7eb; }
-        .pika-single.dark-theme .pika-select-year:focus, .pika-single.dark-theme .pika-select-month:focus { outline: none; border-color: #4f46e5; }
-        .pika-single.dark-theme .pika-label { color: #fff; font-size: 16px; }
-        .pika-single.dark-theme .pika-table th { color: #9ca3af; }
-        .pika-single.dark-theme .pika-button { color: #d1d5db; background: transparent; border-radius: 0.25rem; }
-        .pika-single.dark-theme .pika-button:hover { color: #fff; background: #374151; }
-        .pika-single.dark-theme .is-today .pika-button { color: #818cf8; font-weight: bold; }
-        .pika-single.dark-theme .is-selected .pika-button { color: #fff; background: #4f46e5; box-shadow: none; }
-        .pika-single.dark-theme .is-disabled .pika-button { color: #4b5563; background: transparent; }
-        .pika-single.dark-theme .pika-prev, .pika-single.dark-theme .pika-next { color: #9ca3af; }
-        .pika-single.dark-theme .pika-prev:hover, .pika-single.dark-theme .pika-next:hover { background-color: #374151; }
+        input[type=number] {
+          -moz-appearance: textfield;
+        }
+
+        /* Custom Pikaday Dark Theme */
+        .pika-single.dark-theme {
+            color: #e5e7eb;
+            background: #1f2937;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .pika-single.dark-theme .pika-lendar {
+            width: 100%;
+        }
+        .pika-single.dark-theme .pika-select-year,
+        .pika-single.dark-theme .pika-select-month {
+            -webkit-appearance: none; /* remove default arrow */
+            -moz-appearance: none; /* remove default arrow */
+            appearance: none; /* remove default arrow */
+            color: #e5e7eb !important; /* Force color */
+            background-color: #374151 !important; /* Force background */
+            border: 1px solid #4b5563;
+            border-radius: 0.25rem;
+            font-size: 14px;
+            padding: 4px 8px;
+            margin: 0 4px;
+        }
+        .pika-single.dark-theme .pika-select-month option,
+        .pika-single.dark-theme .pika-select-year option {
+            background-color: #374151;
+            color: #e5e7eb;
+        }
+        .pika-single.dark-theme .pika-select-year:focus,
+        .pika-single.dark-theme .pika-select-month:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+        .pika-single.dark-theme .pika-label {
+            color: #fff;
+            font-size: 16px;
+        }
+        .pika-single.dark-theme .pika-table th {
+            color: #9ca3af;
+        }
+        .pika-single.dark-theme .pika-button {
+            color: #d1d5db;
+            background: transparent;
+            border-radius: 0.25rem;
+        }
+        .pika-single.dark-theme .pika-button:hover {
+            color: #fff;
+            background: #374151;
+        }
+        .pika-single.dark-theme .is-today .pika-button {
+            color: #818cf8;
+            font-weight: bold;
+        }
+        .pika-single.dark-theme .is-selected .pika-button {
+            color: #fff;
+            background: #4f46e5;
+            box-shadow: none;
+        }
+        .pika-single.dark-theme .is-disabled .pika-button {
+            color: #4b5563;
+            background: transparent;
+        }
+        .pika-single.dark-theme .pika-prev,
+        .pika-single.dark-theme .pika-next {
+            color: #9ca3af;
+        }
+         .pika-single.dark-theme .pika-prev:hover,
+        .pika-single.dark-theme .pika-next:hover {
+            background-color: #374151;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white antialiased">
@@ -191,11 +251,11 @@
                 <div class="bg-gray-800/50 p-4 rounded-lg mb-6 flex flex-wrap items-end gap-4">
                     <div class="flex-grow">
                         <label for="filter-start-date" class="block text-sm font-medium text-gray-400 mb-1" data-translate="periodStartLabel">Начало периода</label>
-                        <input type="date" id="filter-start-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2">
+                        <input type="text" id="filter-start-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2" placeholder="Выберите дату...">
                     </div>
                      <div class="flex-grow">
                         <label for="filter-end-date" class="block text-sm font-medium text-gray-400 mb-1" data-translate="periodEndLabel">Конец периода</label>
-                        <input type="date" id="filter-end-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2">
+                        <input type="text" id="filter-end-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2" placeholder="Выберите дату...">
                     </div>
                     <button id="apply-filter-btn" class="flex-shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg" data-translate="applyFilterButton">Применить фильтр</button>
                 </div>
@@ -339,127 +399,13 @@
         // --- Translations ---
         const translations = {
             ru: {
-                loginTitle: 'Войдите в свой аккаунт',
-                passwordPlaceholder: 'Пароль',
-                loginButton: 'Войти',
-                noAccount: 'Нет аккаунта? Зарегистрироваться',
-                createAccountTitle: 'Создать новый аккаунт',
-                registerButton: 'Зарегистрироваться',
-                haveAccount: 'Уже есть аккаунт? Войти',
-                regSuccessTitle: 'Регистрация успешна!',
-                regSuccessMessage: 'Мы отправили ссылку для подтверждения на ваш email. Пожалуйста, перейдите по ней, чтобы активировать аккаунт.',
-                backToLogin: 'Вернуться ко входу',
-                appSubtitle: 'Ваш помощник для учета режима труда и отдыха',
-                addEntryTitle: 'Добавить новую запись',
-                activityTypeLabel: 'Тип деятельности',
-                durationLabel: 'Длительность',
-                hoursPlaceholder: 'Часы',
-                minutesPlaceholder: 'Минуты',
-                mileageLabel: 'Километраж',
-                startPlaceholder: 'Начальный',
-                endPlaceholder: 'Конечный',
-                parkingCostLabel: 'Затраты на парковку (€)',
-                parkingCommentLabel: 'Комментарий к парковке',
-                parkingCommentPlaceholder: 'Название, город...',
-                otherCostsLabel: 'Прочие расходы (€)',
-                otherCostsCommentLabel: 'Комментарий к расходам',
-                otherCostsCommentPlaceholder: 'Оплата дороги, мойка...',
-                saveEntryButton: 'Сохранить запись',
-                overallReportTitle: 'Общий отчет',
-                periodStartLabel: 'Начало периода',
-                periodEndLabel: 'Конец периода',
-                applyFilterButton: 'Применить фильтр',
-                historyTitle: 'История записей',
-                loadingReport: 'Формирование общего отчета...',
-                loadingEntries: 'Загрузка данных...',
-                editEntryTitle: 'Редактировать запись',
-                cancelButton: 'Отмена',
-                saveChangesButton: 'Сохранить изменения',
-                activityTypes: ['Начало смены', 'Конец смены', 'Вождение', 'Работа', 'Ожидание', 'Отдых'],
-                loggedInAs: 'Вы вошли как:',
-                logoutButton: 'Выйти',
+                loginTitle: 'Войдите в свой аккаунт', passwordPlaceholder: 'Пароль', loginButton: 'Войти', noAccount: 'Нет аккаунта? Зарегистрироваться', createAccountTitle: 'Создать новый аккаунт', registerButton: 'Зарегистрироваться', haveAccount: 'Уже есть аккаунт? Войти', regSuccessTitle: 'Регистрация успешна!', regSuccessMessage: 'Мы отправили ссылку для подтверждения на ваш email. Пожалуйста, перейдите по ней, чтобы активировать аккаунт.', backToLogin: 'Вернуться ко входу', appSubtitle: 'Ваш помощник для учета режима труда и отдыха', addEntryTitle: 'Добавить новую запись', activityTypeLabel: 'Тип деятельности', durationLabel: 'Длительность', hoursPlaceholder: 'Часы', minutesPlaceholder: 'Минуты', mileageLabel: 'Километраж', startPlaceholder: 'Начальный', endPlaceholder: 'Конечный', parkingCostLabel: 'Затраты на парковку (€)', parkingCommentLabel: 'Комментарий к парковке', parkingCommentPlaceholder: 'Название, город...', otherCostsLabel: 'Прочие расходы (€)', otherCostsCommentLabel: 'Комментарий к расходам', otherCostsCommentPlaceholder: 'Оплата дороги, мойка...', saveEntryButton: 'Сохранить запись', overallReportTitle: 'Общий отчет', periodStartLabel: 'Начало периода', periodEndLabel: 'Конец периода', applyFilterButton: 'Применить фильтр', historyTitle: 'История записей', loadingReport: 'Формирование общего отчета...', loadingEntries: 'Загрузка данных...', editEntryTitle: 'Редактировать запись', cancelButton: 'Отмена', saveChangesButton: 'Сохранить изменения', activityTypes: ['Начало смены', 'Конец смены', 'Вождение', 'Работа', 'Ожидание', 'Отдых'], loggedInAs: 'Вы вошли как:', logoutButton: 'Выйти', parking: 'Парковка', other: 'Прочее', confirmDelete: 'Вы уверены, что хотите удалить эту запись?', errorDelete: 'Произошла ошибка при удалении записи.', errorSaving: 'Произошла ошибка при сохранении данных.', errorUpdate: 'Ошибка при обновлении записи.', errorLogin: 'Ошибка входа', errorRegister: 'Ошибка регистрации', errorDuration: 'Пожалуйста, введите корректную длительность.', errorMileage: 'Конечный километраж не может быть меньше начального.', notAuthorizedError: 'Пользователь не авторизован или Supabase не инициализирован.', noEntriesForPeriod: 'Нет записей за выбранный период.', noEntriesYet: 'Записей пока нет. Добавьте первую!', noReportData: 'Нет данных для отчета.', daysWorked: 'Отработано дней', totalMileage: 'Общий пробег', totalExpenses: 'Общие расходы', geolocationNotSupported: 'Геолокация не поддерживается вашим браузером.', errorGeocoding: 'Не удалось определить адрес. Попробуйте снова.', errorGeolocationPermission: 'Не удалось получить геолокацию. Убедитесь, что вы разрешили доступ в настройках браузера.'
             },
             uk: {
-                loginTitle: 'Увійдіть у свій обліковий запис',
-                passwordPlaceholder: 'Пароль',
-                loginButton: 'Увійти',
-                noAccount: 'Немає акаунту? Зареєструватися',
-                createAccountTitle: 'Створити новий акаунт',
-                registerButton: 'Зареєструватися',
-                haveAccount: 'Вже є акаунт? Увійти',
-                regSuccessTitle: 'Реєстрація успішна!',
-                regSuccessMessage: 'Ми надіслали посилання для підтвердження на ваш email. Будь ласка, перейдіть за ним, щоб активувати акаунт.',
-                backToLogin: 'Повернутися до входу',
-                appSubtitle: 'Ваш помічник для обліку режиму праці та відпочинку',
-                addEntryTitle: 'Додати новий запис',
-                activityTypeLabel: 'Тип діяльності',
-                durationLabel: 'Тривалість',
-                hoursPlaceholder: 'Години',
-                minutesPlaceholder: 'Хвилини',
-                mileageLabel: 'Кілометраж',
-                startPlaceholder: 'Початковий',
-                endPlaceholder: 'Кінцевий',
-                parkingCostLabel: 'Витрати на паркування (€)',
-                parkingCommentLabel: 'Коментар до паркування',
-                parkingCommentPlaceholder: 'Назва, місто...',
-                otherCostsLabel: 'Інші витрати (€)',
-                otherCostsCommentLabel: 'Коментар до витрат',
-                otherCostsCommentPlaceholder: 'Оплата дороги, мийка...',
-                saveEntryButton: 'Зберегти запис',
-                overallReportTitle: 'Загальний звіт',
-                periodStartLabel: 'Початок періоду',
-                periodEndLabel: 'Кінець періоду',
-                applyFilterButton: 'Застосувати фільтр',
-                historyTitle: 'Історія записів',
-                loadingReport: 'Формування загального звіту...',
-                loadingEntries: 'Завантаження даних...',
-                editEntryTitle: 'Редагувати запис',
-                cancelButton: 'Скасувати',
-                saveChangesButton: 'Зберегти зміни',
-                activityTypes: ['Початок зміни', 'Кінець зміни', 'Водіння', 'Робота', 'Очікування', 'Відпочинок'],
-                loggedInAs: 'Ви увійшли як:',
-                logoutButton: 'Вийти',
+                loginTitle: 'Увійдіть у свій обліковий запис', passwordPlaceholder: 'Пароль', loginButton: 'Увійти', noAccount: 'Немає акаунту? Зареєструватися', createAccountTitle: 'Створити новий акаунт', registerButton: 'Зареєструватися', haveAccount: 'Вже є акаунт? Увійти', regSuccessTitle: 'Реєстрація успішна!', regSuccessMessage: 'Ми надіслали посилання для підтвердження на ваш email. Будь ласка, перейдіть за ним, щоб активувати акаунт.', backToLogin: 'Повернутися до входу', appSubtitle: 'Ваш помічник для обліку режиму праці та відпочинку', addEntryTitle: 'Додати новий запис', activityTypeLabel: 'Тип діяльності', durationLabel: 'Тривалість', hoursPlaceholder: 'Години', minutesPlaceholder: 'Хвилини', mileageLabel: 'Кілометраж', startPlaceholder: 'Початковий', endPlaceholder: 'Кінцевий', parkingCostLabel: 'Витрати на паркування (€)', parkingCommentLabel: 'Коментар до паркування', parkingCommentPlaceholder: 'Назва, місто...', otherCostsLabel: 'Інші витрати (€)', otherCostsCommentLabel: 'Коментар до витрат', otherCostsCommentPlaceholder: 'Оплата дороги, мийка...', saveEntryButton: 'Зберегти запис', overallReportTitle: 'Загальний звіт', periodStartLabel: 'Початок періоду', periodEndLabel: 'Кінець періоду', applyFilterButton: 'Застосувати фільтр', historyTitle: 'Історія записів', loadingReport: 'Формування загального звіту...', loadingEntries: 'Завантаження даних...', editEntryTitle: 'Редагувати запис', cancelButton: 'Скасувати', saveChangesButton: 'Зберегти зміни', activityTypes: ['Початок зміни', 'Кінець зміни', 'Водіння', 'Робота', 'Очікування', 'Відпочинок'], loggedInAs: 'Ви увійшли як:', logoutButton: 'Вийти', parking: 'Паркування', other: 'Інше', confirmDelete: 'Ви впевнені, що хочете видалити цей запис?', errorDelete: 'Сталася помилка під час видалення запису.', errorSaving: 'Сталася помилка під час збереження даних.', errorUpdate: 'Помилка під час оновлення запису.', errorLogin: 'Помилка входу', errorRegister: 'Помилка реєстрації', errorDuration: 'Будь ласка, введіть коректну тривалість.', errorMileage: 'Кінцевий кілометраж не може бути меншим за початковий.', notAuthorizedError: 'Користувач не авторизований або Supabase не ініціалізовано.', noEntriesForPeriod: 'Немає записів за вибраний період.', noEntriesYet: 'Записів поки що немає. Додайте першу!', noReportData: 'Немає даних для звіту.', daysWorked: 'Відпрацьовано днів', totalMileage: 'Загальний пробіг', totalExpenses: 'Загальні витрати', geolocationNotSupported: 'Геолокація не підтримується вашим браузером.', errorGeocoding: 'Не вдалося визначити адресу. Спробуйте знову.', errorGeolocationPermission: 'Не вдалося отримати геолокацію. Переконайтеся, що ви дозволили доступ у налаштуваннях браузера.'
             },
             pl: {
-                loginTitle: 'Zaloguj się na swoje konto',
-                passwordPlaceholder: 'Hasło',
-                loginButton: 'Zaloguj się',
-                noAccount: 'Nie masz konta? Zarejestruj się',
-                createAccountTitle: 'Utwórz nowe konto',
-                registerButton: 'Zarejestruj się',
-                haveAccount: 'Masz już konto? Zaloguj się',
-                regSuccessTitle: 'Rejestracja udana!',
-                regSuccessMessage: 'Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto.',
-                backToLogin: 'Powrót do logowania',
-                appSubtitle: 'Twój asystent do śledzenia czasu pracy i odpoczynku',
-                addEntryTitle: 'Dodaj nowy wpis',
-                activityTypeLabel: 'Rodzaj czynności',
-                durationLabel: 'Czas trwania',
-                hoursPlaceholder: 'Godziny',
-                minutesPlaceholder: 'Minuty',
-                mileageLabel: 'Przebieg',
-                startPlaceholder: 'Początkowy',
-                endPlaceholder: 'Końcowy',
-                parkingCostLabel: 'Koszty parkowania (€)',
-                parkingCommentLabel: 'Komentarz do parkowania',
-                parkingCommentPlaceholder: 'Nazwa, miasto...',
-                otherCostsLabel: 'Inne koszty (€)',
-                otherCostsCommentLabel: 'Komentarz do kosztów',
-                otherCostsCommentPlaceholder: 'Opłata drogowa, myjnia...',
-                saveEntryButton: 'Zapisz wpis',
-                overallReportTitle: 'Raport ogólny',
-                periodStartLabel: 'Początek okresu',
-                periodEndLabel: 'Koniec okresu',
-                applyFilterButton: 'Zastosuj filtr',
-                historyTitle: 'Historia wpisów',
-                loadingReport: 'Generowanie raportu...',
-                loadingEntries: 'Ładowanie danych...',
-                editEntryTitle: 'Edytuj wpis',
-                cancelButton: 'Anuluj',
-                saveChangesButton: 'Zapisz zmiany',
-                activityTypes: ['Początek zmiany', 'Koniec zmiany', 'Jazda', 'Praca', 'Oczekiwanie', 'Odpoczynek'],
-                loggedInAs: 'Zalogowano jako:',
-                logoutButton: 'Wyloguj',
+                loginTitle: 'Zaloguj się na swoje konto', passwordPlaceholder: 'Hasło', loginButton: 'Zaloguj się', noAccount: 'Nie masz konta? Zarejestruj się', createAccountTitle: 'Utwórz nowe konto', registerButton: 'Zarejestruj się', haveAccount: 'Masz już konto? Zaloguj się', regSuccessTitle: 'Rejestracja udana!', regSuccessMessage: 'Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto.', backToLogin: 'Powrót do logowania', appSubtitle: 'Twój asystent do śledzenia czasu pracy i odpoczynku', addEntryTitle: 'Dodaj nowy wpis', activityTypeLabel: 'Rodzaj czynności', durationLabel: 'Czas trwania', hoursPlaceholder: 'Godziny', minutesPlaceholder: 'Minuty', mileageLabel: 'Przebieg', startPlaceholder: 'Początkowy', endPlaceholder: 'Końcowy', parkingCostLabel: 'Koszty parkowania (€)', parkingCommentLabel: 'Komentarz do parkowania', parkingCommentPlaceholder: 'Nazwa, miasto...', otherCostsLabel: 'Inne koszty (€)', otherCostsCommentLabel: 'Komentarz do kosztów', otherCostsCommentPlaceholder: 'Opłata drogowa, myjnia...', saveEntryButton: 'Zapisz wpis', overallReportTitle: 'Raport ogólny', periodStartLabel: 'Początek okresu', periodEndLabel: 'Koniec okresu', applyFilterButton: 'Zastosuj filtr', historyTitle: 'Historia wpisów', loadingReport: 'Generowanie raportu...', loadingEntries: 'Ładowanie danych...', editEntryTitle: 'Edytuj wpis', cancelButton: 'Anuluj', saveChangesButton: 'Zapisz zmiany', activityTypes: ['Początek zmiany', 'Koniec zmiany', 'Jazda', 'Praca', 'Oczekiwanie', 'Odpoczynek'], loggedInAs: 'Zalogowano jako:', logoutButton: 'Wyloguj', parking: 'Parkowanie', other: 'Inne', confirmDelete: 'Czy na pewno chcesz usunąć ten wpis?', errorDelete: 'Wystąpił błąd podczas usuwania wpisu.', errorSaving: 'Wystąpił błąd podczas zapisywania danych.', errorUpdate: 'Błąd podczas aktualizacji wpisu.', errorLogin: 'Błąd logowania', errorRegister: 'Błąd rejestracji', errorDuration: 'Proszę podać prawidłowy czas trwania.', errorMileage: 'Końcowy przebieg не może być mniejszy niż początkowy.', notAuthorizedError: 'Użytkownik nie jest autoryzowany lub Supabase nie jest zainicjowany.', noEntriesForPeriod: 'Brak wpisów dla wybranego okresu.', noEntriesYet: 'Brak jeszcze wpisów. Dodaj pierwszy!', noReportData: 'Brak danych do raportu.', daysWorked: 'Przepracowane dni', totalMileage: 'Całkowity przebieg', totalExpenses: 'Koszty całkowite', geolocationNotSupported: 'Geolokalizacja nie jest obsługiwana przez Twoją przeglądarkę.', errorGeocoding: 'Nie udało się ustalić adresu. Spróbuj ponownie.', errorGeolocationPermission: 'Nie udało się uzyskać geolokalizacji. Upewnij się, że zezwoliłeś na dostęp w ustawieniach przeglądarki.'
             }
         };
 
@@ -484,7 +430,6 @@
                 el.placeholder = t(key);
             });
             
-            // Update activity dropdowns
             const translatedActivityTypes = t('activityTypes');
             allElements.activityTypeSelect.innerHTML = '';
             allElements.editActivityTypeSelect.innerHTML = '';
@@ -493,13 +438,11 @@
                 allElements.editActivityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
             });
 
-            // Re-render data to update dynamic text like dates
             if(allDocsData.length > 0) {
                 applyFilter();
             }
         }
 
-        // --- Helper Functions --- (unchanged)
         const formatMinutes = (totalMinutes) => {
             if (isNaN(totalMinutes) || totalMinutes <= 0) return '0 мин';
             const hours = Math.floor(totalMinutes / 60);
@@ -510,7 +453,6 @@
             return parts.join(' ');
         };
 
-        // --- Data Fetching and Rendering --- (unchanged from previous version)
         async function fetchAndRenderLogs() {
             if (!currentUserId || !supabase) return;
             const { data, error } = await supabase.from('logs').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
@@ -562,8 +504,9 @@
         
         function renderOverallReport(docs, numberOfDays) {
             const summary = docs.reduce((acc, doc) => {
-                if(activityTypes.slice(2).includes(doc.activity_type)) { // Only count work/drive etc.
-                    acc.totalDuration[doc.activity_type] = (acc.totalDuration[doc.activity_type] || 0) + (doc.duration || 0);
+                const activityTypeKey = Object.keys(translations.ru.activityTypes).find(key => translations[currentLanguage].activityTypes[key] === doc.activity_type) || doc.activity_type;
+                if(activityTypes.slice(2).includes(activityTypeKey)) {
+                    acc.totalDuration[activityTypeKey] = (acc.totalDuration[activityTypeKey] || 0) + (doc.duration || 0);
                 }
                 if (doc.start_mileage != null && doc.end_mileage != null && doc.end_mileage > doc.start_mileage) {
                     acc.totalDistance += doc.end_mileage - doc.start_mileage;
@@ -578,13 +521,13 @@
             reportCard.className = 'bg-gray-800 p-5 rounded-lg shadow-lg animate-fade-in';
             reportCard.innerHTML = `
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300">
-                    <p><strong>${t('daysWorked') || 'Отработано дней'}:</strong> ${numberOfDays}</p>
-                    <p><strong>${t('totalMileage') || 'Общий пробег'}:</strong> ${summary.totalDistance} км</p>
-                    <p><strong>${t('activityTypes')[2]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[2]])}</p>
-                    <p><strong>${t('activityTypes')[3]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[3]])}</p>
-                    <p><strong>${t('activityTypes')[4]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[4]])}</p>
-                    <p><strong>${t('activityTypes')[5]}:</strong> ${formatMinutes(summary.totalDuration[t('activityTypes')[5]])}</p>
-                    <p class="sm:col-span-2"><strong>${t('totalExpenses') || 'Общие расходы'}:</strong> <span class="font-bold text-white">${(summary.totalParkingCost + summary.totalOtherCost).toFixed(2)} €</span></p>
+                    <p><strong>${t('daysWorked')}:</strong> ${numberOfDays}</p>
+                    <p><strong>${t('totalMileage')}:</strong> ${summary.totalDistance} км</p>
+                    <p><strong>${t('activityTypes')[2]}:</strong> ${formatMinutes(summary.totalDuration[activityTypes[2]])}</p>
+                    <p><strong>${t('activityTypes')[3]}:</strong> ${formatMinutes(summary.totalDuration[activityTypes[3]])}</p>
+                    <p><strong>${t('activityTypes')[4]}:</strong> ${formatMinutes(summary.totalDuration[activityTypes[4]])}</p>
+                    <p><strong>${t('activityTypes')[5]}:</strong> ${formatMinutes(summary.totalDuration[activityTypes[5]])}</p>
+                    <p class="sm:col-span-2"><strong>${t('totalExpenses')}:</strong> <span class="font-bold text-white">${(summary.totalParkingCost + summary.totalOtherCost).toFixed(2)} €</span></p>
                 </div>
             `;
             reportContainer.appendChild(reportCard);
@@ -621,13 +564,13 @@
 
         function renderLogEntry(doc, parentContainer) {
             const entryElement = logEntryTemplate.content.cloneNode(true).firstElementChild;
-            const style = activityStyles[doc.activity_type] || activityStyles[t('activityTypes')[3]];
+            const style = activityStyles[doc.activity_type] || activityStyles['Работа'];
             entryElement.querySelector('[data-icon-container]').innerHTML = style.icon;
             entryElement.querySelector('[data-icon-container]').className = `p-3 rounded-full mt-1 shrink-0 ${style.color}`;
             entryElement.querySelector('[data-activity-type]').textContent = doc.activity_type || 'Неизвестно';
             entryElement.querySelector('[data-timestamp]').textContent = new Date(doc.created_at).toLocaleTimeString(currentLanguage, { hour: '2-digit', minute: '2-digit' });
             const durationEl = entryElement.querySelector('[data-duration]');
-            if (activityTypes.slice(2).includes(doc.activity_type)) {
+            if (t('activityTypes').slice(2).includes(doc.activity_type)) {
                 durationEl.textContent = formatMinutes(doc.duration);
             } else {
                 durationEl.style.display = 'none';
@@ -727,13 +670,9 @@
             // Language setup
             const savedLang = localStorage.getItem('tachoAppLanguage');
             const browserLang = navigator.language.split('-')[0];
-            if (savedLang) {
-                setLanguage(savedLang);
-            } else if (['uk', 'pl'].includes(browserLang)) {
-                setLanguage(browserLang);
-            } else {
-                setLanguage('ru');
-            }
+            if (savedLang) { setLanguage(savedLang);
+            } else if (['uk', 'pl'].includes(browserLang)) { setLanguage(browserLang);
+            } else { setLanguage('ru'); }
 
             // Auth listeners
             supabase.auth.onAuthStateChange((event, session) => {
@@ -755,21 +694,21 @@
             // Form listeners
             logForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if (!currentUserId || !supabase) return alert(t('notAuthorizedError') || "Пользователь не авторизован или Supabase не инициализирован.");
+                if (!currentUserId || !supabase) return alert(t('notAuthorizedError'));
                 const activity = activityTypeSelect.value;
                 let newLog = { activity_type: activity, user_id: currentUserId };
-                if (activity !== t('activityTypes')[0] && activity !== t('activityTypes')[1]) {
+                if (!t('activityTypes').slice(0,2).includes(activity)) {
                     const hours = parseInt(logForm.elements['duration-hours'].value, 10) || 0;
                     const minutes = parseInt(logForm.elements['duration-minutes'].value, 10) || 0;
                     const totalDurationInMinutes = (hours * 60) + minutes;
-                    if (totalDurationInMinutes <= 0) return alert(t('errorDuration') || "Пожалуйста, введите корректную длительность.");
+                    if (totalDurationInMinutes <= 0) return alert(t('errorDuration'));
                     const startMileage = parseInt(logForm.elements['start-mileage'].value, 10);
                     const endMileage = parseInt(logForm.elements['end-mileage'].value, 10);
-                    if (!isNaN(startMileage) && !isNaN(endMileage) && endMileage < startMileage) return alert(t('errorMileage') || "Конечный километраж не может быть меньше начального.");
+                    if (!isNaN(startMileage) && !isNaN(endMileage) && endMileage < startMileage) return alert(t('errorMileage'));
                     Object.assign(newLog, { duration: totalDurationInMinutes, start_mileage: !isNaN(startMileage) ? startMileage : null, end_mileage: !isNaN(endMileage) ? endMileage : null, parking_cost: parseFloat(logForm.elements['parking-cost'].value) || 0, parking_comment: logForm.elements['parking-comment'].value.trim(), other_cost: parseFloat(logForm.elements['other-cost'].value) || 0, other_cost_comment: logForm.elements['other-cost-comment'].value.trim(), });
                 }
                 const { error } = await supabase.from('logs').insert([newLog]);
-                if (error) { console.error("Error adding document: ", error); alert(t('errorSaving') || "Произошла ошибка при сохранении данных.");
+                if (error) { console.error("Error adding document: ", error); alert(t('errorSaving'));
                 } else { logForm.reset(); toggleActivityFields(); activityTypeSelect.focus(); fetchAndRenderLogs(); }
             });
             editLogForm.addEventListener('submit', async (e) => {
@@ -778,7 +717,7 @@
                 if (!logId || !supabase) return;
                 const activity = editActivityTypeSelect.value;
                 let updatedLog = { activity_type: activity };
-                if (activity !== t('activityTypes')[0] && activity !== t('activityTypes')[1]) {
+                if (!t('activityTypes').slice(0,2).includes(activity)) {
                     const hours = parseInt(editLogForm.elements['edit-duration-hours'].value, 10) || 0;
                     const minutes = parseInt(editLogForm.elements['edit-duration-minutes'].value, 10) || 0;
                     updatedLog.duration = (hours * 60) + minutes;
@@ -794,7 +733,7 @@
                     updatedLog.duration = null; updatedLog.start_mileage = null; updatedLog.end_mileage = null; updatedLog.parking_cost = null; updatedLog.parking_comment = null; updatedLog.other_cost = null; updatedLog.other_cost_comment = null;
                 }
                 const { error } = await supabase.from('logs').update(updatedLog).eq('id', logId);
-                if(error) { console.error('Error updating log:', error); alert(t('errorUpdate') || 'Ошибка при обновлении записи.');
+                if(error) { console.error('Error updating log:', error); alert(t('errorUpdate'));
                 } else { closeEditModal(); fetchAndRenderLogs(); }
             });
             loginForm.addEventListener('submit', async (e) => {
