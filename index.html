@@ -6,6 +6,8 @@
     <title>Tacho App: Режим труда и отдыха (Supabase)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Pikaday Calendar Library -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
     <style>
         body { font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 8px; }
@@ -18,7 +20,6 @@
         .day-entries-wrapper.collapsed { max-height: 0; }
         .chevron-icon { transition: transform 0.3s ease-in-out; }
         .chevron-icon.rotated { transform: rotate(-90deg); }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
           -webkit-appearance: none; 
@@ -26,6 +27,63 @@
         }
         input[type=number] {
           -moz-appearance: textfield;
+        }
+
+        /* Custom Pikaday Dark Theme */
+        .pika-single.dark-theme {
+            color: #e5e7eb;
+            background: #1f2937;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .pika-single.dark-theme .pika-lendar {
+            width: 100%;
+        }
+        .pika-single.dark-theme .pika-select-year,
+        .pika-single.dark-theme .pika-select-month {
+            color: #d1d5db;
+            background: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 0.25rem;
+            font-size: 14px;
+        }
+        .pika-single.dark-theme .pika-label {
+            color: #fff;
+            font-size: 16px;
+        }
+        .pika-single.dark-theme .pika-table th {
+            color: #9ca3af;
+        }
+        .pika-single.dark-theme .pika-button {
+            color: #d1d5db;
+            background: transparent;
+            border-radius: 0.25rem;
+        }
+        .pika-single.dark-theme .pika-button:hover {
+            color: #fff;
+            background: #374151;
+        }
+        .pika-single.dark-theme .is-today .pika-button {
+            color: #818cf8;
+            font-weight: bold;
+        }
+        .pika-single.dark-theme .is-selected .pika-button {
+            color: #fff;
+            background: #4f46e5;
+            box-shadow: none;
+        }
+        .pika-single.dark-theme .is-disabled .pika-button {
+            color: #4b5563;
+            background: transparent;
+        }
+        .pika-single.dark-theme .pika-prev,
+        .pika-single.dark-theme .pika-next {
+            color: #9ca3af;
+        }
+         .pika-single.dark-theme .pika-prev:hover,
+        .pika-single.dark-theme .pika-next:hover {
+            background-color: #374151;
         }
     </style>
 </head>
@@ -109,21 +167,13 @@
         </header>
 
         <main>
-            <!-- Input Form Card -->
             <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
                 <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-4">Добавить новую запись</h2>
                 <form id="log-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     
                     <div class="md:col-span-2">
                         <label for="activity-type" class="block text-sm font-medium text-gray-300 mb-2">Тип деятельности</label>
-                        <select id="activity-type" name="activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3">
-                            <option value="Начало смены">Начало смены</option>
-                            <option value="Конец смены">Конец смены</option>
-                            <option value="Вождение">Вождение</option>
-                            <option value="Работа">Работа</option>
-                            <option value="Ожидание">Ожидание</option>
-                            <option value="Отдых">Отдых</option>
-                        </select>
+                        <select id="activity-type" name="activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3"></select>
                     </div>
                     
                     <div id="activity-fields" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -162,7 +212,6 @@
                         </div>
                     </div>
 
-
                     <div class="md:col-span-2">
                          <button type="submit" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500">
                             Сохранить запись
@@ -176,11 +225,11 @@
                 <div class="bg-gray-800/50 p-4 rounded-lg mb-6 flex flex-wrap items-end gap-4">
                     <div class="flex-grow">
                         <label for="filter-start-date" class="block text-sm font-medium text-gray-400 mb-1">Начало периода</label>
-                        <input type="date" id="filter-start-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2">
+                        <input type="text" id="filter-start-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2" placeholder="Выберите дату...">
                     </div>
                      <div class="flex-grow">
                         <label for="filter-end-date" class="block text-sm font-medium text-gray-400 mb-1">Конец периода</label>
-                        <input type="date" id="filter-end-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2">
+                        <input type="text" id="filter-end-date" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2" placeholder="Выберите дату...">
                     </div>
                     <button id="apply-filter-btn" class="flex-shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Применить фильтр</button>
                 </div>
@@ -207,14 +256,7 @@
                  <input type="hidden" id="edit-log-id">
                  <div class="md:col-span-2">
                     <label for="edit-activity-type" class="block text-sm font-medium text-gray-300 mb-2">Тип деятельности</label>
-                    <select id="edit-activity-type" name="edit-activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3">
-                        <option value="Начало смены">Начало смены</option>
-                        <option value="Конец смены">Конец смены</option>
-                        <option value="Вождение">Вождение</option>
-                        <option value="Работа">Работа</option>
-                        <option value="Ожидание">Ожидание</option>
-                        <option value="Отдых">Отдых</option>
-                    </select>
+                    <select id="edit-activity-type" name="edit-activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3"></select>
                 </div>
                  <div id="edit-activity-fields" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     <div>
@@ -281,6 +323,7 @@
         </div>
     </template>
     
+    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
         
@@ -317,6 +360,8 @@
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
         const editActivityFields = document.getElementById('edit-activity-fields');
         const editActivityTypeSelect = document.getElementById('edit-activity-type');
+
+        const activityTypes = ['Начало смены', 'Конец смены', 'Вождение', 'Работа', 'Ожидание', 'Отдых'];
 
         const activityStyles = {
             'Начало смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`, color: 'bg-green-900/50' },
@@ -696,6 +741,22 @@
                     appContainer.classList.add('hidden');
                     authScreen.classList.remove('hidden');
                 }
+            });
+
+            const i18n_russian = {
+                previousMonth : 'Предыдущий месяц',
+                nextMonth     : 'Следующий месяц',
+                months        : ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+                weekdays      : ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],
+                weekdaysShort : ['Вс','Пн','Вт','Ср','Чт','Пт','Сб']
+            };
+
+            new Pikaday({ field: filterStartDateInput, format: 'YYYY-MM-DD', i18n: i18n_russian, theme: 'dark-theme' });
+            new Pikaday({ field: filterEndDateInput, format: 'YYYY-MM-DD', i18n: i18n_russian, theme: 'dark-theme' });
+
+            activityTypes.forEach(type => {
+                activityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                editActivityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
             });
 
             applyFilterBtn.addEventListener('click', applyFilter);
