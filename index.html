@@ -19,25 +19,82 @@
         .chevron-icon { transition: transform 0.3s ease-in-out; }
         .chevron-icon.rotated { transform: rotate(-90deg); }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
-        /* Hide number input spinners */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
           -webkit-appearance: none; 
           margin: 0; 
         }
         input[type=number] {
-          -moz-appearance: textfield; /* Firefox */
+          -moz-appearance: textfield;
         }
     </style>
 </head>
 <body class="bg-gray-900 text-white antialiased">
 
-    <div id="app-container" class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Войдите в свой аккаунт</h2>
+            </div>
+            <form id="login-form" class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <input id="login-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
+                    </div>
+                    <div>
+                        <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Войти
+                    </button>
+                </div>
+            </form>
+             <div class="text-sm text-center">
+                <a href="#" id="show-register-link" class="font-medium text-indigo-400 hover:text-indigo-300">
+                    Нет аккаунта? Зарегистрироваться
+                </a>
+            </div>
+             <p id="auth-error" class="mt-2 text-center text-sm text-red-500"></p>
+        </div>
+        
+        <div id="register-form-container" class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg hidden">
+             <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-white">Создать новый аккаунт</h2>
+            </div>
+            <form id="register-form" class="mt-8 space-y-6">
+                 <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <input id="register-email" name="email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
+                    </div>
+                    <div>
+                        <input id="register-password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Пароль">
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Зарегистрироваться
+                    </button>
+                </div>
+            </form>
+             <div class="text-sm text-center">
+                <a href="#" id="show-login-link" class="font-medium text-indigo-400 hover:text-indigo-300">
+                    Уже есть аккаунт? Войти
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main App Container -->
+    <div id="app-container" class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 hidden">
         
         <header class="mb-8 text-center">
             <h1 class="text-3xl sm:text-4xl font-bold text-indigo-400">Tacho App</h1>
             <p class="text-gray-400 mt-2">Ваш помощник для учета режима труда и отдыха</p>
-            <div id="user-info" class="mt-4 text-xs text-gray-500"></div>
+            <div id="user-info" class="mt-4 text-xs text-gray-400"></div>
         </header>
 
         <main>
@@ -62,35 +119,35 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Длительность</label>
                             <div class="flex gap-4">
-                                <input type="number" id="duration-hours" name="duration-hours" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="Часы">
-                                <input type="number" id="duration-minutes" name="duration-minutes" min="0" max="59" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="Минуты">
+                                <input type="number" id="duration-hours" name="duration-hours" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Часы">
+                                <input type="number" id="duration-minutes" name="duration-minutes" min="0" max="59" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Минуты">
                             </div>
                         </div>
 
                          <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Километраж</label>
                             <div class="flex gap-4">
-                                <input type="number" id="start-mileage" name="start-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="Начальный">
-                                <input type="number" id="end-mileage" name="end-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="Конечный">
+                                <input type="number" id="start-mileage" name="start-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Начальный">
+                                <input type="number" id="end-mileage" name="end-mileage" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Конечный">
                             </div>
                         </div>
 
                         <div>
                             <label for="parking-cost" class="block text-sm font-medium text-gray-300 mb-2">Затраты на парковку (€)</label>
-                            <input type="number" id="parking-cost" name="parking-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="15.50">
+                            <input type="number" id="parking-cost" name="parking-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="15.50">
                         </div>
                         <div>
                             <label for="parking-comment" class="block text-sm font-medium text-gray-300 mb-2">Комментарий к парковке</label>
-                            <input type="text" id="parking-comment" name="parking-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="Название, город...">
+                            <input type="text" id="parking-comment" name="parking-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Название, город...">
                         </div>
 
                         <div>
                             <label for="other-cost" class="block text-sm font-medium text-gray-300 mb-2">Прочие расходы (€)</label>
-                            <input type="number" id="other-cost" name="other-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="5.25">
+                            <input type="number" id="other-cost" name="other-cost" step="0.01" min="0" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="5.25">
                         </div>
                         <div>
                             <label for="other-cost-comment" class="block text-sm font-medium text-gray-300 mb-2">Комментарий к расходам</label>
-                            <input type="text" id="other-cost-comment" name="other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3" placeholder="Оплата дороги, мойка...">
+                            <input type="text" id="other-cost-comment" name="other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Оплата дороги, мойка...">
                         </div>
                     </div>
 
@@ -218,20 +275,29 @@
         
         let supabase;
         let allDocsData = [];
-        let userId = null;
+        let currentUserId = null;
 
+        // Main App DOM Elements
+        const appContainer = document.getElementById('app-container');
         const logForm = document.getElementById('log-form');
         const activityTypeSelect = document.getElementById('activity-type');
         const activityFields = document.getElementById('activity-fields');
         const logEntriesContainer = document.getElementById('log-entries');
         const reportContainer = document.getElementById('report-container');
         const logEntryTemplate = document.getElementById('log-entry-template');
-        const loadingLogs = document.getElementById('loading-state-logs');
-        const loadingReport = document.getElementById('loading-state-report');
         const userInfoDiv = document.getElementById('user-info');
         const filterStartDateInput = document.getElementById('filter-start-date');
         const filterEndDateInput = document.getElementById('filter-end-date');
         const applyFilterBtn = document.getElementById('apply-filter-btn');
+
+        // Auth DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const registerFormContainer = document.getElementById('register-form-container');
+        const showRegisterLink = document.getElementById('show-register-link');
+        const showLoginLink = document.getElementById('show-login-link');
+        const authError = document.getElementById('auth-error');
 
         // Edit Modal Elements
         const editModal = document.getElementById('edit-modal');
@@ -267,11 +333,11 @@
         };
 
         async function fetchAndRenderLogs() {
-            if (!userId || !supabase) return;
+            if (!currentUserId || !supabase) return;
             const { data, error } = await supabase
                 .from('logs')
                 .select('*')
-                .eq('user_id', userId)
+                .eq('user_id', currentUserId)
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -293,9 +359,7 @@
             if (startDate || endDate) {
                 filteredData = allDocsData.filter(doc => {
                     const docDate = new Date(doc.created_at);
-                    const isAfterStart = !startDate || docDate >= startDate;
-                    const isBeforeEnd = !endDate || docDate <= endDate;
-                    return isAfterStart && isBeforeEnd;
+                    return (!startDate || docDate >= startDate) && (!endDate || docDate <= endDate);
                 });
             }
             renderData(filteredData);
@@ -306,10 +370,9 @@
             reportContainer.innerHTML = '';
 
             if (docsToDisplay.length === 0) {
-                loadingLogs.textContent = 'Нет записей за выбранный период.';
-                loadingReport.textContent = 'Нет данных для отчета за выбранный период.';
-                logEntriesContainer.appendChild(loadingLogs);
-                reportContainer.appendChild(loadingReport);
+                const stateText = (filterStartDateInput.value || filterEndDateInput.value) ? 'Нет записей за выбранный период.' : 'Записей пока нет. Добавьте первую!';
+                logEntriesContainer.innerHTML = `<p class="text-center text-gray-500 py-8">${stateText}</p>`;
+                reportContainer.innerHTML = `<p class="text-center text-gray-500 py-8">Нет данных для отчета.</p>`;
                 return;
             }
 
@@ -467,10 +530,10 @@
 
         logForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!userId || !supabase) return alert("Пользователь не авторизован или Supabase не инициализирован.");
+            if (!currentUserId || !supabase) return alert("Пользователь не авторизован или Supabase не инициализирован.");
             
             const activity = activityTypeSelect.value;
-            let newLog = { activity_type: activity, user_id: userId };
+            let newLog = { activity_type: activity, user_id: currentUserId };
 
             if (activity !== 'Начало смены' && activity !== 'Конец смены') {
                 const hours = parseInt(logForm.elements['duration-hours'].value, 10) || 0;
@@ -548,41 +611,74 @@
                 fetchAndRenderLogs();
             }
         });
+        
+        // ---- AUTHENTICATION LOGIC ----
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginForm.elements.email.value;
+            const password = loginForm.elements.password.value;
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) authError.textContent = 'Ошибка входа: ' + error.message;
+            else authError.textContent = '';
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = registerForm.elements.email.value;
+            const password = registerForm.elements.password.value;
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) authError.textContent = 'Ошибка регистрации: ' + error.message;
+            else {
+                authError.textContent = 'Пожалуйста, проверьте вашу почту для подтверждения регистрации.';
+                registerForm.reset();
+            }
+        });
+
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.parentElement.classList.add('hidden');
+            registerFormContainer.classList.remove('hidden');
+            authError.textContent = '';
+        });
+
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerFormContainer.classList.add('hidden');
+            loginForm.parentElement.classList.remove('hidden');
+            authError.textContent = '';
+        });
+
 
         async function main() {
             const supabaseUrl = 'https://fdefnbmqbljhkokmflya.supabase.co'; 
             const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZWZuYm1xYmxqaGtva21mbHlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTIyOTMsImV4cCI6MjA2NjI2ODI5M30.S83ZOKO77isvYaW7P79b-mgeL-AzNZD6nkqzSyZYNDU';
         
             if (supabaseUrl === 'YOUR_SUPABASE_URL' || supabaseKey === 'YOUR_SUPABASE_ANON_KEY') {
-                document.getElementById('app-container').innerHTML = `<div class="h-screen flex items-center justify-center text-center text-white bg-gray-900 p-4"><p class="text-2xl">Ошибка: Конфигурация Supabase не найдена.<br>Пожалуйста, следуйте руководству, чтобы вставить ваши ключи в HTML-файл.</p></div>`;
+                document.body.innerHTML = `<div class="h-screen flex items-center justify-center text-center text-white bg-gray-900 p-4"><p class="text-2xl">Ошибка: Конфигурация Supabase не найдена.<br>Пожалуйста, следуйте руководству, чтобы вставить ваши ключи в HTML-файл.</p></div>`;
                 return;
             }
             
             supabase = createClient(supabaseUrl, supabaseKey);
-            
-            const sessionResponse = await supabase.auth.getSession();
-            const session = sessionResponse.data.session;
-            
-            if (session) {
-                userId = session.user.id;
-            } else {
-                const signInResponse = await supabase.auth.signInAnonymously();
-                if (signInResponse.error) {
-                    return console.error("Anonymous sign in failed:", signInResponse.error);
-                }
-                if (signInResponse.data.user) {
-                    userId = signInResponse.data.user.id;
-                }
-            }
 
-            if (!userId) {
-                console.error("Could not get user ID.");
-                return;
-            }
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (session && session.user) {
+                    currentUserId = session.user.id;
+                    appContainer.classList.remove('hidden');
+                    authScreen.classList.add('hidden');
+                    userInfoDiv.innerHTML = `<span>Вы вошли как: ${session.user.email}</span><button id="logout-btn" class="ml-4 text-indigo-400 hover:text-indigo-300">[Выйти]</button>`;
+                    document.getElementById('logout-btn').addEventListener('click', async () => {
+                        await supabase.auth.signOut();
+                    });
+                    fetchAndRenderLogs();
+                } else {
+                    currentUserId = null;
+                    appContainer.classList.add('hidden');
+                    authScreen.classList.remove('hidden');
+                }
+            });
 
-            userInfoDiv.innerHTML = `Ваш ID: <span class="font-mono">${userId}</span>`;
-            
-            await fetchAndRenderLogs();
+            // Initial setup for non-app elements
             applyFilterBtn.addEventListener('click', applyFilter);
             activityTypeSelect.addEventListener('change', () => toggleActivityFields('main'));
             editActivityTypeSelect.addEventListener('change', () => toggleActivityFields('edit'));
