@@ -109,13 +109,21 @@
         </header>
 
         <main>
+            <!-- Input Form Card -->
             <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
                 <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-4">Добавить новую запись</h2>
                 <form id="log-form" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     
                     <div class="md:col-span-2">
                         <label for="activity-type" class="block text-sm font-medium text-gray-300 mb-2">Тип деятельности</label>
-                        <select id="activity-type" name="activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3"></select>
+                        <select id="activity-type" name="activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3">
+                            <option value="Начало смены">Начало смены</option>
+                            <option value="Конец смены">Конец смены</option>
+                            <option value="Вождение">Вождение</option>
+                            <option value="Работа">Работа</option>
+                            <option value="Ожидание">Ожидание</option>
+                            <option value="Отдых">Отдых</option>
+                        </select>
                     </div>
                     
                     <div id="activity-fields" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -153,6 +161,7 @@
                             <input type="text" id="other-cost-comment" name="other-cost-comment" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3" placeholder="Оплата дороги, мойка...">
                         </div>
                     </div>
+
 
                     <div class="md:col-span-2">
                          <button type="submit" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500">
@@ -198,7 +207,14 @@
                  <input type="hidden" id="edit-log-id">
                  <div class="md:col-span-2">
                     <label for="edit-activity-type" class="block text-sm font-medium text-gray-300 mb-2">Тип деятельности</label>
-                    <select id="edit-activity-type" name="edit-activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3"></select>
+                    <select id="edit-activity-type" name="edit-activity-type" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-3">
+                        <option value="Начало смены">Начало смены</option>
+                        <option value="Конец смены">Конец смены</option>
+                        <option value="Вождение">Вождение</option>
+                        <option value="Работа">Работа</option>
+                        <option value="Ожидание">Ожидание</option>
+                        <option value="Отдых">Отдых</option>
+                    </select>
                 </div>
                  <div id="edit-activity-fields" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     <div>
@@ -301,8 +317,6 @@
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
         const editActivityFields = document.getElementById('edit-activity-fields');
         const editActivityTypeSelect = document.getElementById('edit-activity-type');
-
-        const activityTypes = ['Начало смены', 'Конец смены', 'Вождение', 'Работа', 'Ожидание', 'Отдых'];
 
         const activityStyles = {
             'Начало смены': { icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`, color: 'bg-green-900/50' },
@@ -682,22 +696,6 @@
                     appContainer.classList.add('hidden');
                     authScreen.classList.remove('hidden');
                 }
-            });
-
-            const i18n_russian = {
-                previousMonth : 'Предыдущий месяц',
-                nextMonth     : 'Следующий месяц',
-                months        : ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-                weekdays      : ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],
-                weekdaysShort : ['Вс','Пн','Вт','Ср','Чт','Пт','Сб']
-            };
-
-            new Pikaday({ field: filterStartDateInput, format: 'YYYY-MM-DD', i18n: i18n_russian, theme: 'dark-theme' });
-            new Pikaday({ field: filterEndDateInput, format: 'YYYY-MM-DD', i18n: i18n_russian, theme: 'dark-theme' });
-
-            activityTypes.forEach(type => {
-                activityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-                editActivityTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
             });
 
             applyFilterBtn.addEventListener('click', applyFilter);
